@@ -1,0 +1,57 @@
+enum BillStatus {
+  UNPAID
+  PAID
+}
+
+enum PaymentStatus {
+  INITIATED
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model Bill {
+  id           String     @id @default(uuid(7))
+  customerId   String
+  customer     User       @relation(fields: [customerId], references: [id])
+  billingMonth String
+  units        Float
+  amount       Decimal    @db.Decimal(12, 2)
+  breakdown    Json?
+  dueDate      DateTime
+  status       BillStatus @default(UNPAID)
+  paidAt       DateTime?
+  payments     Payment[]
+  deletedAt    DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([customerId, billingMonth])
+  @@index([status, dueDate])
+  @@map("bills")
+}
+
+model Payment {
+  id                    String        @id @default(uuid(7))
+  billId                String
+  bill                  Bill          @relation(fields: [billId], references: [id])
+  userId                String
+  user                  User          @relation(fields: [userId], references: [id])
+  amount                Decimal       @db.Decimal(12, 2)
+  currency              String        @default("BDT")
+  provider              String        @default("BKASH")
+  status                PaymentStatus @default(INITIATED)
+  merchantInvoiceNumber String        @unique
+  bkashPaymentId        String?       @unique
+  bkashUrl              String?
+  trxId                 String?       @unique
+  failureReason         String?
+  rawResponse           Json?
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@index([billId, status])
+  @@index([userId, createdAt])
+  @@map("payments")
+}

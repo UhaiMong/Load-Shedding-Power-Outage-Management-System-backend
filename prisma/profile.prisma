@@ -1,0 +1,23 @@
+model Profile {
+  id          String   @id @default(uuid(7))
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone       String?
+  address     String?
+  meterNumber String?  @unique
+  // Customer: the area they live in
+  areaId      String?
+  area        Area?    @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  // Staff (technician/operator): the zone they work in
+  zoneId      String?
+  zone        Zone?    @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  // Technician state: isAvailable = on duty (self-managed), isBusy = on a job (system-managed)
+  isAvailable Boolean  @default(true)
+  isBusy      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([areaId])
+  @@index([zoneId])
+  @@map("profiles")
+}

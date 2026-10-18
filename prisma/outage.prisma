@@ -1,0 +1,54 @@
+enum OutageStatus {
+  REPORTED
+  VERIFIED
+  ASSIGNED
+  IN_PROGRESS
+  RESTORED
+  REJECTED
+}
+
+model Outage {
+  id                     String         @id @default(uuid(7))
+  ticketNo               String         @unique
+  areaId                 String
+  area                   Area           @relation(fields: [areaId], references: [id])
+  status                 OutageStatus   @default(REPORTED)
+  severity               PriorityLevel  @default(MEDIUM)
+  description            String?
+  cause                  String?
+  reportCount            Int            @default(1)
+  technicianId           String?
+  technician             User?          @relation("TechnicianOutages", fields: [technicianId], references: [id], onDelete: SetNull)
+  startedAt              DateTime       @default(now())
+  verifiedAt             DateTime?
+  assignedAt             DateTime?
+  repairStartedAt        DateTime?
+  restoredAt             DateTime?
+  estimatedRestorationAt DateTime?
+  resolutionNotes        String?
+  reports                OutageReport[]
+  deletedAt              DateTime?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  @@index([areaId, status])
+  @@index([technicianId, status])
+  @@index([status, startedAt])
+  @@index([deletedAt])
+  @@map("outages")
+}
+
+model OutageReport {
+  id          String   @id @default(uuid(7))
+  outageId    String
+  outage      Outage   @relation(fields: [outageId], references: [id], onDelete: Cascade)
+  reporterId  String
+  reporter    User     @relation(fields: [reporterId], references: [id])
+  description String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+
+  @@unique([outageId, reporterId])
+  @@index([reporterId])
+  @@map("outage_reports")
+}

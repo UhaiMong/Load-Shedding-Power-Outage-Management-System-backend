@@ -1,0 +1,39 @@
+enum ScheduleType {
+  LOAD_SHEDDING
+  MAINTENANCE
+  EMERGENCY
+}
+
+enum ScheduleStatus {
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+// areaId = null means the whole feeder is affected.
+model ScheduledOutage {
+  id           String         @id @default(uuid(7))
+  feederId     String
+  feeder       Feeder         @relation(fields: [feederId], references: [id])
+  areaId       String?
+  area         Area?          @relation(fields: [areaId], references: [id])
+  startTime    DateTime
+  endTime      DateTime
+  type         ScheduleType   @default(LOAD_SHEDDING)
+  status       ScheduleStatus @default(SCHEDULED)
+  reason       String?
+  batchId      String?
+  cancelReason String?
+  createdById  String?
+  createdBy    User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  deletedAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([feederId, startTime, endTime])
+  @@index([status, startTime])
+  @@index([batchId])
+  @@index([areaId])
+  @@map("scheduled_outages")
+}
