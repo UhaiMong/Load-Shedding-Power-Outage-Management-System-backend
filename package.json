@@ -5,7 +5,11 @@
   "main": "app.js",
   "scripts": {
     "dev": "",
-    "build": "tsc ",
+    "build": "tsx watch server/app.ts",
+    "start": "node api/app.js",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate",
+    "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1",
     "contract:emit": "prisma contract emit"
   },

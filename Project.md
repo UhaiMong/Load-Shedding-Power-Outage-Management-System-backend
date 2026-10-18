@@ -1,5 +1,7 @@
 # 3. Load Shedding & Power Outage Management System
 
+## (Fully backend part) - No Frontend UI
+
 **Category:** Utility / Public Service
 
 ```text
@@ -73,7 +75,7 @@ Notification      Customer Report
 
 ## 📋 Project Requirements
 
-> 💡 **Note:** Read these carefully. While not every single point is strictly fixed, you must follow this general guideline to ensure your project meets expectations.
+> 💡 **Note:** Read these carefully. While not every single point is strictly fixed, you must follow this general guideline to ensure this project meets expectations.
 
 ## 🛠️ Tech Stack
 
@@ -93,22 +95,22 @@ Notification      Customer Report
 
 ## 🎯 Core Project Rules
 
-- **Roles**: must have minimum **3 fixed primary roles** (e.g., Customer, Provider, Admin). Role permissions must be strictly defined and enforced.
+- **Roles**: must have minimum **3 fixed primary roles** (e.g., Customer, Power Operator, Technician, Zone Manager, Admin) . Role permissions must be strictly defined and enforced.
 - **Payment Integration**: This is **MANDATORY**. You must integrate **bKash sendbox[not real payment]**. This system must securely handle payment creation, success/cancellation callbacks, and status tracking. _Cash on Delivery, Pay Later, or fake manual status updates are NOT accepted._
-- **No Frontend Required**: This is a backend-focused assignment. You do not need to build a UI. Use Postman, Thunder Client, or Swagger to demonstrate your API.
+- **No Frontend Required**: This is a backend-focused assignment. You do not need to build a UI. I will use Postman to demonstrate API.
 - **Security & Protection**:
   - Hash passwords securely, never expose secrets, and protect all private routes.
   - Implement **Rate Limiting** (e.g., using `express-rate-limit`) to prevent API abuse.
   - Use security headers (e.g., `helmet`) and configure **CORS** properly.
-- **Performance & Concurrency**: Optimize your backend using database indexing, efficient Prisma queries (e.g., using `select`), and Redis caching. Use **database transactions** to handle concurrency and prevent race conditions (e.g., double-booking a resource).
+- **Performance & Concurrency**: Optimize the backend using database indexing, efficient Prisma queries (e.g., using `select`), and Redis caching. Use **database transactions** to handle concurrency and prevent race conditions (e.g., double-booking a resource).
 
 ---
 
 ## ⚙️ Minimum 20 APIs Requirement
 
-Each project must implement and document **at least 20 meaningful API endpoints**.
+This project must implement and document **at least 20 meaningful API endpoints**.
 
-These APIs must represent the actual functionality of your selected project. You should not create unnecessary, duplicate, or dummy endpoints just to fulfill the API count.
+These APIs must represent the actual functionality of this project. You should not create unnecessary, duplicate, or dummy endpoints just to fulfill the API count.
 
 ### API Technical Requirements
 
@@ -117,7 +119,7 @@ These APIs must represent the actual functionality of your selected project. You
   - **Success**: `{ "success": true, "message": "Operation successful", "data": {} }`
   - **Error**: `{ "success": false, "message": "Something went wrong", "errors": [] }`
 - **Authentication & Authorization**: Protected APIs must use **Bearer Token authentication**. You must implement strict **role-based middleware** to enforce the 3 project roles.
-- **Validation & Error Handling**: All applicable APIs must have proper **server-side validation** (using Zod or Joi) and return structured error messages for invalid inputs.
+- **Validation & Error Handling**: All applicable APIs must have proper **server-side validation** (using Zod) and return structured error messages for invalid inputs.
 - **Advanced Data Fetching**:
   - At least one list API must support **pagination** (e.g., `?page=1&limit=10`).
   - At least one list API must support **filtering and/or sorting** (e.g., `?status=active&sortBy=createdAt`).
@@ -181,3 +183,26 @@ PATCH  /api/v1/admin/users/:id/role
 GET    /api/v1/admin/dashboard-stats
 GET    /api/v1/admin/audit-logs          # Track system changes
 ```
+
+# Backend project folder structure
+
+/prisma/*
+
+- profile.prisma
+- user.prisma
+- schema.prisma<br/>
+  ... should be followed this structure for all prisma
+
+/src/*
+
+- config/ [configuration]
+- middleware/
+- module/*
+  /users/*
+- user.controller.ts
+- user.route.ts
+- user.service.ts
+- user.validator.ts<br/>
+  ... should be follow all other modules<br/>
+- lib
+- utils
