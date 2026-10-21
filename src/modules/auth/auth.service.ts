@@ -1,3 +1,5 @@
+import type { IncomingHttpHeaders } from "node:http";
+import { fromNodeHeaders } from "better-auth/node";
 import type { Prisma } from "../../../generated/prisma/client";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
@@ -91,4 +93,45 @@ export const login = async (input: LoginInput, ip?: string) => {
     { action: "USER_LOGIN", entity: "User", entityId: user.id },
   );
   return { user, token: headers.get("set-auth-token") ?? response.token };
+};
+
+// refresh token
+export const refreshToken = async (
+  reqHeaders: IncomingHttpHeaders,
+  ip?: string,
+) => {
+  const current = await auth.api.getSession({
+    headers: fromNodeHeaders(reqHeaders),
+    query: { disableCookieCache: true },
+  });
+  if (!current)
+    throw new AppError(
+      401,
+      "Session is invalid or expired. Please log in again",
+    );
+
+  const ctx = await auth.$context;
+  const fresh = await ctx.internalAdapter.createSession(current.user.id);
+  await ctx.internalAdapter.deleteSession(current.session.token);
+
+  await audit(
+    prisma as Parameters<typeof audit>[0],
+    { id: current.user.id, ...(ip !== undefined ? { ip } : {}) },
+    { action: "TOKEN_REFRESHED", entity: "User", entityId: current.user.id },
+  );
+  return { token: fresh.token, expiresAt: fresh.expiresAt };
+};
+
+export const logout = async (
+  reqHeaders: IncomingHttpHeaders,
+  userId: string,
+  ip?: string,
+) => {
+  await auth.api.signOut({ headers: fromNodeHeaders(reqHeaders) });
+  await audit(
+    prisma as Parameters<typeof audit>[0],
+    { id: userId, ...(ip !== undefined ? { ip } : {}) },
+    { action: "USER_LOGOUT", entity: "User", entityId: userId },
+  );
+  return { loggedOut: true };
 };
