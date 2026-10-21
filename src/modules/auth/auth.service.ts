@@ -1,0 +1,68 @@
+import type { Prisma } from "../../../generated/prisma/client";
+import { auth } from "../../lib/auth";
+import { prisma } from "../../lib/prisma";
+import { AppError } from "../../utils/ApiError";
+import { audit } from "../../utils/audit";
+import type { RegisterInput } from "./auth.validator";
+
+const publicUser = {
+  id: true,
+  name: true,
+  email: true,
+  image: true,
+  role: true,
+  createdAt: true,
+} satisfies Prisma.UserSelect;
+
+export const register = async (input: RegisterInput, ip?: string) => {
+  if (input.areaId) {
+    const area = await prisma.area.findFirst({
+      where: { id: input.areaId, deletedAt: null },
+      select: { id: true },
+    });
+    if (!area) throw new AppError(404, "Area not found");
+  }
+  if (input.meterNumber) {
+    const taken = await prisma.profile.findUnique({
+      where: { meterNumber: input.meterNumber },
+      select: { id: true },
+    });
+    if (taken) throw new AppError(409, "Meter number is already registered");
+  }
+  const existing = await prisma.user.findUnique({
+    where: { email: input.email },
+    select: { id: true },
+  });
+  if (existing)
+    throw new AppError(409, "An account with this email already exists");
+
+  // Self-registration always creates a CUSTOMER (DB default); staff accounts are created by admins.
+  const { headers, response } = await auth.api.signUpEmail({
+    body: { name: input.name, email: input.email, password: input.password },
+    returnHeaders: true,
+  });
+  const userId = response.user.id;
+
+  await prisma.$transaction(async (tx) => {
+    await tx.profile.create({
+      data: {
+        userId,
+        phone: input.phone ?? null,
+        address: input.address ?? null,
+        meterNumber: input.meterNumber ?? null,
+        areaId: input.areaId ?? null,
+      },
+    });
+    await audit(
+      tx as Parameters<typeof audit>[0],
+      { id: userId, ...(ip !== undefined ? { ip } : {}) },
+      { action: "USER_REGISTERED", entity: "User", entityId: userId },
+    );
+  });
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: publicUser,
+  });
+  return { user, token: headers.get("set-auth-token") ?? response.token };
+};

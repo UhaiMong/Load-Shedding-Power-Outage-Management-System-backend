@@ -1,4 +1,5 @@
 import express from "express";
+import routes from "./routes";
 
 export const app = express();
 
@@ -16,3 +17,4 @@ app.get("/health", (_req, res) => {
     data: { uptime: process.uptime() },
   });
 });
+app.use("/api/v1", routes);
