@@ -1,25 +1,44 @@
 import { app } from "./app";
 import { env } from "./config/env";
-
-const shutdown = (signal: NodeJS.Signals) => {
-  console.log(`Received ${signal}. Shutting down server...`);
-  server.close(() => {
-    console.log("Server closed successfully.");
-    process.exit(0);
-  });
-};
+import { cache } from "./lib/cache";
+import { prisma } from "./lib/prisma";
+import { syncScheduleStates } from "./modules/schedule/schedule.service";
 
 const server = app.listen(env.PORT, () => {
-  console.log(`API listening on :${env.PORT} (${env.NODE_ENV})`);
+  console.log(
+    `API listening on :http://localhost:${env.PORT} /(${env.NODE_ENV})`,
+  );
 });
 
-server.on("error", (error: Error & { code?: string }) => {
-  console.error("Server failed to start:", error);
-  process.exit(1);
-});
+// Moves planned outages SCHEDULED
+const SYNC_MS = 60_000;
+const timer = setInterval(() => {
+  syncScheduleStates().catch((err) =>
+    console.error("[schedule-sync]", err instanceof Error ? err.message : err),
+  );
+}, SYNC_MS);
+timer.unref();
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+const shutdown = (signal: string) => {
+  console.log(`${signal} received, shutting down...`);
+  clearInterval(timer);
+  server.close(async () => {
+    await Promise.allSettled([prisma.$disconnect(), cache.close()]);
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(1), 10_000).unref();
+};
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+process.on("unhandledRejection", (reason) => {
+  console.error("[unhandledRejection]", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException]", err);
+  shutdown("uncaughtException");
+});
 
 export { server };
 export default server;

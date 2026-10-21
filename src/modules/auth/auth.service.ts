@@ -3,7 +3,7 @@ import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/ApiError";
 import { audit } from "../../utils/audit";
-import type { RegisterInput } from "./auth.validator";
+import type { LoginInput, RegisterInput } from "./auth.validator";
 
 const publicUser = {
   id: true,
@@ -64,5 +64,31 @@ export const register = async (input: RegisterInput, ip?: string) => {
     where: { id: userId },
     select: publicUser,
   });
+  return { user, token: headers.get("set-auth-token") ?? response.token };
+};
+
+export const login = async (input: LoginInput, ip?: string) => {
+  const account = await prisma.user.findUnique({
+    where: { email: input.email },
+    select: { isActive: true, deletedAt: true },
+  });
+  if (account && (account.deletedAt || !account.isActive)) {
+    throw new AppError(403, "This account is deactivated");
+  }
+
+  const { headers, response } = await auth.api.signInEmail({
+    body: { email: input.email, password: input.password },
+    returnHeaders: true,
+  });
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: response.user.id },
+    select: publicUser,
+  });
+  await audit(
+    prisma as Parameters<typeof audit>[0],
+    { id: user.id, ...(ip !== undefined ? { ip } : {}) },
+    { action: "USER_LOGIN", entity: "User", entityId: user.id },
+  );
   return { user, token: headers.get("set-auth-token") ?? response.token };
 };
