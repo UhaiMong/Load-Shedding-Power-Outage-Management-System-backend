@@ -2,43 +2,43 @@ import "dotenv/config";
 import { z } from "zod";
 
 const optional = z
-  .string()
-  .optional()
-  .transform((v) => (v && v.trim() !== "" ? v.trim() : undefined));
+	.string()
+	.optional()
+	.transform((v) => (v && v.trim() !== "" ? v.trim() : undefined));
 
 const schema = z.object({
-  NODE_ENV: z
-    .enum(["development", "test", "production"])
-    .default("development"),
-  PORT: z.coerce.number().int().positive().default(5000),
-  APP_URL: z.url().default("http://localhost:5000"),
-  APP_TIMEZONE: z.string().default("Asia/Dhaka"),
-  CORS_ORIGINS: z
-    .string()
-    .default("http://localhost:3000")
-    .transform((v) =>
-      v
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-    ),
+	NODE_ENV: z
+		.enum(["development", "test", "production"])
+		.default("development"),
+	PORT: z.coerce.number().int().positive().default(5000),
+	APP_URL: z.url().default("http://localhost:5000"),
+	APP_TIMEZONE: z.string().default("Asia/Dhaka"),
+	CORS_ORIGINS: z
+		.string()
+		.default("http://localhost:3000")
+		.transform((v) =>
+			v
+				.split(",")
+				.map((s) => s.trim())
+				.filter(Boolean),
+		),
 
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  BETTER_AUTH_URL: z.string().min(1, "BETTER_AUTH_URL is required"),
-  BETTER_AUTH_SECRET: z.string().min(1, "BETTER_AUTH_SECRET is required"),
-  GOOGLE_CLIENT_ID: optional,
-  GOOGLE_CLIENT_SECRET: optional,
-  // Optional
-  REDIS_URL: optional,
+	DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+	BETTER_AUTH_URL: z.string().min(1, "BETTER_AUTH_URL is required"),
+	BETTER_AUTH_SECRET: z.string().min(1, "BETTER_AUTH_SECRET is required"),
+	GOOGLE_CLIENT_ID: optional,
+	GOOGLE_CLIENT_SECRET: optional,
+	// Optional
+	REDIS_URL: optional,
 });
 
 const parsed = schema.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error(
-    `Invalid environment configuration:\n${z.prettifyError(parsed.error)}`,
-  );
-  process.exit(1);
+	console.error(
+		`Invalid environment configuration:\n${z.prettifyError(parsed.error)}`,
+	);
+	process.exit(1);
 }
 
 export const env = parsed.data;

@@ -7,14 +7,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (_req, res) => {
-  res.send("App is running!");
+	res.send("App is running!");
 });
 
 app.get("/health", (_req, res) => {
-  res.json({
-    success: true,
-    message: "OK",
-    data: { uptime: process.uptime() },
-  });
+	res.json({
+		success: true,
+		message: "OK",
+		data: { uptime: process.uptime() },
+	});
 });
 app.use("/api/v1", routes);

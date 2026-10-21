@@ -4,10 +4,10 @@ import analyticsRoutes from "./modules/analytics/analytics.route";
 import authRoutes from "./modules/auth/auth.route";
 import billRoutes from "./modules/bill/bill.route";
 import {
-  areaRouter,
-  feederRouter,
-  substationRouter,
-  zoneRouter,
+	areaRouter,
+	feederRouter,
+	substationRouter,
+	zoneRouter,
 } from "./modules/network/network.route";
 import notificationRoutes from "./modules/notification/notification.route";
 import outageRoutes from "./modules/outage/outage.route";
