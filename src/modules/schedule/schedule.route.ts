@@ -24,5 +24,11 @@ router.post(
   controller.create,
 );
 router.get("/:id", validate({ params: idParamSchema }), controller.getById);
+router.patch(
+  "/:id",
+  staff,
+  validate({ params: idParamSchema, body: rescheduleSchema }),
+  controller.reschedule,
+);
 
 export default router;

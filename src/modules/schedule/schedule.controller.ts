@@ -29,3 +29,9 @@ export const getById = catchAsync(async (req, res) => {
     data: await service.getById(param(req, "id"), getActor(req)),
   });
 });
+export const reschedule = catchAsync(async (req, res) => {
+  sendResponse(res, {
+    message: "Outage rescheduled",
+    data: await service.reschedule(param(req, "id"), req.body, getActor(req)),
+  });
+});

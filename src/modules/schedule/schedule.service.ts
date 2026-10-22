@@ -266,4 +266,76 @@ export const getById = async (id: string, actor: Actor) => {
   };
 };
 
+// Reschedule
+export const reschedule = async (
+  id: string,
+  input: RescheduleInput,
+  actor: Actor,
+) => {
+  const current = await getScheduleForActor(id);
+  await assertZoneAccess(actor, current.feeder.substation.zoneId);
+  if (current.status !== ScheduleStatus.SCHEDULED)
+    throw new AppError(409, "Only SCHEDULED outages can be changed");
+
+  const start = input.startTime ?? current.startTime;
+  const end = input.endTime ?? current.endTime;
+  if (end <= start) throw new AppError(400, "endTime must be after startTime");
+  if (end.getTime() - start.getTime() > 24 * HOUR_MS)
+    throw new AppError(400, "An outage cannot be longer than 24 hours");
+  if (end.getTime() <= Date.now())
+    throw new AppError(400, "endTime must be in the future");
+
+  const updated = await prisma.$transaction(async (tx) => {
+    await advisoryLock(
+      tx as unknown as Parameters<typeof advisoryLock>[0],
+      `feeder-schedule:${current.feederId}`,
+    );
+    const conflicts = await findConflicts(
+      tx as unknown as Parameters<typeof findConflicts>[0],
+      {
+        feederId: current.feederId,
+        areaId: current.areaId,
+        start,
+        end,
+        excludeId: id,
+      },
+    );
+    if (conflicts.length) throwConflict(conflicts);
+
+    const { count } = await tx.scheduledOutage.updateMany({
+      where: { id, status: ScheduleStatus.SCHEDULED, deletedAt: null },
+      data: {
+        startTime: start,
+        endTime: end,
+        reason: input.reason ?? current.reason,
+      },
+    });
+    if (count !== 1)
+      throw new AppError(
+        409,
+        "Outage changed state while updating. Please retry",
+      );
+    await audit(tx as unknown as Parameters<typeof audit>[0], actor, {
+      action: "SCHEDULE_RESCHEDULED",
+      entity: "ScheduledOutage",
+      entityId: id,
+      metadata: {
+        from: describeWindow(current.startTime, current.endTime),
+        to: describeWindow(start, end),
+      },
+    });
+    return tx.scheduledOutage.findUniqueOrThrow({
+      where: { id },
+      select: scheduleSelect,
+    });
+  });
+
+  notifyAffected(
+    updated,
+    "Planned outage rescheduled",
+    `${current.feeder.name}: now ${describeWindow(start, end)}`,
+  );
+  return updated;
+};
+
 export const syncScheduleStates = async () => {};
