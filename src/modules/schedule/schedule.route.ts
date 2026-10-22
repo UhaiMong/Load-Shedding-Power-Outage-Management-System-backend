@@ -23,5 +23,6 @@ router.post(
   validate({ body: createScheduleSchema }),
   controller.create,
 );
+router.get("/:id", validate({ params: idParamSchema }), controller.getById);
 
 export default router;

@@ -120,6 +120,26 @@ const loadFeeder = async (feederId: string) => {
   if (!feeder) throw new AppError(404, "Feeder not found");
   return feeder;
 };
+const getScheduleForActor = async (id: string) => {
+  const row = await prisma.scheduledOutage.findFirst({
+    where: { id, deletedAt: null },
+    select: {
+      ...scheduleSelect,
+      feeder: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          priority: true,
+          substation: { select: { zoneId: true } },
+        },
+      },
+    },
+  });
+  if (!row) throw new AppError(404, "Scheduled outage not found");
+  return row;
+};
+
 // CRUD
 export const create = async (input: CreateScheduleInput, actor: Actor) => {
   const feeder = await loadFeeder(input.feederId);
@@ -229,6 +249,21 @@ export const list = async (query: ListSchedulesQuery, actor: Actor) => {
     prisma.scheduledOutage.count({ where }),
   ]);
   return { items, meta: buildMeta(query.page, query.limit, total) };
+};
+
+export const getById = async (id: string, actor: Actor) => {
+  const { feeder, ...row } = await getScheduleForActor(id);
+  if (actor.role === Role.ZONE_MANAGER)
+    await assertZoneAccess(actor, feeder.substation.zoneId);
+  return {
+    ...row,
+    feeder: {
+      id: feeder.id,
+      name: feeder.name,
+      code: feeder.code,
+      priority: feeder.priority,
+    },
+  };
 };
 
 export const syncScheduleStates = async () => {};

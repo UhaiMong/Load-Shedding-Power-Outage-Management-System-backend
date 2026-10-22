@@ -23,3 +23,9 @@ export const list = catchAsync(async (req, res) => {
     meta,
   });
 });
+export const getById = catchAsync(async (req, res) => {
+  sendResponse(res, {
+    message: "Scheduled outage fetched",
+    data: await service.getById(param(req, "id"), getActor(req)),
+  });
+});
