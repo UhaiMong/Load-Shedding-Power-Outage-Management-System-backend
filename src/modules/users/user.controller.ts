@@ -16,3 +16,27 @@ export const updateMe = catchAsync(async (req: Request, res) => {
   const data = await service.updateMe(getActor(req), req.body);
   sendResponse(res, { message: "Profile updated", data });
 });
+export const uploadAvatar = catchAsync(async (req: Request, res) => {
+  const data = await service.uploadAvatar(getActor(req), req.file);
+  sendResponse(res, { message: "Avatar updated", data });
+});
+
+export const setAvailability = catchAsync(async (req: Request, res) => {
+  const data = await service.setAvailability(
+    getActor(req),
+    req.body.isAvailable,
+  );
+  sendResponse(res, { message: "Availability updated", data });
+});
+
+export const deleteMe = catchAsync(async (req: Request, res) => {
+  const data = await service.deleteMe(getActor(req));
+  sendResponse(res, { message: "Account deleted", data });
+});
+
+export const listTechnicians = catchAsync(async (req: Request, res) => {
+  const { items, meta } = await service.listTechnicians(
+    getQuery<ListTechniciansQuery>(req),
+  );
+  sendResponse(res, { message: "Technicians fetched", data: items, meta });
+});
