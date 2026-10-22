@@ -13,6 +13,15 @@ import {
 } from "./schedule.validator";
 
 const router = Router();
-router.post("/", validate({ body: createScheduleSchema }), controller.create);
+router.use(authenticate);
+
+const staff = authorize(...ROLE_GROUPS.STAFF);
+router.get("/", validate({ query: listSchedulesQuery }), controller.list);
+router.post(
+  "/",
+  staff,
+  validate({ body: createScheduleSchema }),
+  controller.create,
+);
 
 export default router;

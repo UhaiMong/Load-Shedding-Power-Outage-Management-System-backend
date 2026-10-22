@@ -11,3 +11,15 @@ export const create = catchAsync(async (req, res) => {
     data: await service.create(req.body, getActor(req)),
   });
 });
+
+export const list = catchAsync(async (req, res) => {
+  const { items, meta } = await service.list(
+    getQuery<ListSchedulesQuery>(req),
+    getActor(req),
+  );
+  sendResponse(res, {
+    message: "Scheduled outages fetched",
+    data: items,
+    meta,
+  });
+});

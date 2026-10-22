@@ -176,5 +176,59 @@ export const create = async (input: CreateScheduleInput, actor: Actor) => {
   );
   return created;
 };
+// schedule listing
+export const list = async (query: ListSchedulesQuery, actor: Actor) => {
+  const AND: Prisma.ScheduledOutageWhereInput[] = [{ deletedAt: null }];
+
+  if (actor.role === Role.CUSTOMER) {
+    const profile = await prisma.profile.findUnique({
+      where: { userId: actor.id as string },
+      select: { areaId: true, area: { select: { feederId: true } } },
+    });
+    if (!profile?.area)
+      return { items: [], meta: buildMeta(query.page, query.limit, 0) };
+    AND.push({
+      feederId: profile.area.feederId,
+      OR: [{ areaId: null }, { areaId: profile.areaId }],
+    });
+  } else if (actor.role === Role.ZONE_MANAGER) {
+    AND.push({
+      feeder: { substation: { zone: { managerId: actor.id as string } } },
+    });
+  }
+
+  if (query.status) AND.push({ status: query.status });
+  if (query.type) AND.push({ type: query.type });
+  if (query.feederId) AND.push({ feederId: query.feederId });
+  if (query.areaId)
+    AND.push({
+      OR: [
+        { areaId: query.areaId },
+        { areaId: null, feeder: { areas: { some: { id: query.areaId } } } },
+      ],
+    });
+  if (query.zoneId)
+    AND.push({ feeder: { substation: { zoneId: query.zoneId as string } } });
+  if (query.from || query.to)
+    AND.push({
+      startTime: {
+        ...(query.from !== undefined ? { gte: query.from } : {}),
+        ...(query.to !== undefined ? { lte: query.to } : {}),
+      },
+    });
+  if (query.q) AND.push({ reason: containsInsensitive(query.q) });
+
+  const where: Prisma.ScheduledOutageWhereInput = { AND };
+  const [items, total] = await Promise.all([
+    prisma.scheduledOutage.findMany({
+      where,
+      select: scheduleSelect,
+      orderBy: { [query.sortBy]: query.order },
+      ...getSkipTake(query),
+    }),
+    prisma.scheduledOutage.count({ where }),
+  ]);
+  return { items, meta: buildMeta(query.page, query.limit, total) };
+};
 
 export const syncScheduleStates = async () => {};
