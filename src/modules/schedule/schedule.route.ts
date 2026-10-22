@@ -16,12 +16,19 @@ const router = Router();
 router.use(authenticate);
 
 const staff = authorize(...ROLE_GROUPS.STAFF);
+
 router.get("/", validate({ query: listSchedulesQuery }), controller.list);
 router.post(
   "/",
   staff,
   validate({ body: createScheduleSchema }),
   controller.create,
+);
+router.post(
+  "/generate",
+  staff,
+  validate({ body: generateScheduleSchema }),
+  controller.generate,
 );
 router.get("/:id", validate({ params: idParamSchema }), controller.getById);
 router.patch(
@@ -35,6 +42,12 @@ router.post(
   staff,
   validate({ params: idParamSchema, body: cancelScheduleSchema }),
   controller.cancel,
+);
+router.delete(
+  "/:id",
+  authorize(...ROLE_GROUPS.ADMIN),
+  validate({ params: idParamSchema }),
+  controller.remove,
 );
 
 export default router;

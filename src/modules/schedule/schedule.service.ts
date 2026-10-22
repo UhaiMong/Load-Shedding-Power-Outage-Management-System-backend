@@ -162,6 +162,20 @@ const getScheduleForActor = async (id: string) => {
   return row;
 };
 
+// automated generation
+const PRIORITY_WEIGHT: Record<PriorityLevel, number> = {
+  LOW: 0,
+  MEDIUM: 1,
+  HIGH: 2,
+  CRITICAL: 3,
+};
+
+interface Busy {
+  start: Date;
+  end: Date;
+  shedding: boolean;
+}
+
 // CRUD
 export const create = async (input: CreateScheduleInput, actor: Actor) => {
   const feeder = await loadFeeder(input.feederId);
@@ -397,4 +411,319 @@ export const cancel = async (id: string, reason: string, actor: Actor) => {
   return updated;
 };
 
-export const syncScheduleStates = async () => {};
+// Soft delete
+export const softDelete = async (id: string, actor: Actor) => {
+  const { count } = await prisma.scheduledOutage.updateMany({
+    where: { id, deletedAt: null, status: { not: ScheduleStatus.ACTIVE } },
+    data: { deletedAt: new Date() },
+  });
+  if (count === 0)
+    throw new AppError(
+      409,
+      "Outage not found or currently ACTIVE (cancel it first)",
+    );
+  await audit(prisma as unknown as Parameters<typeof audit>[0], actor, {
+    action: "SCHEDULE_DELETED",
+    entity: "ScheduledOutage",
+    entityId: id,
+  });
+  return { deleted: true };
+};
+
+// Priority based fairness-aware generator
+export const generate = async (input: GenerateScheduleInput, actor: Actor) => {
+  await assertZoneAccess(actor, input.zoneId);
+
+  const [y, m, d] = input.date.split("-").map(Number) as [
+    number,
+    number,
+    number,
+  ];
+  const dayStart = new Date(
+    Date.UTC(y, m - 1, d) - input.utcOffsetMinutes * 60_000,
+  );
+  const dayEnd = new Date(dayStart.getTime() + 24 * HOUR_MS);
+  const historyStart = new Date(dayStart.getTime() - 7 * 24 * HOUR_MS);
+
+  const slots: { start: Date; end: Date }[] = [];
+  for (
+    let h = input.startHour;
+    h + input.slotHours <= input.endHour;
+    h += input.slotHours
+  ) {
+    slots.push({
+      start: new Date(dayStart.getTime() + h * HOUR_MS),
+      end: new Date(dayStart.getTime() + (h + input.slotHours) * HOUR_MS),
+    });
+  }
+  if (slots.length === 0)
+    throw new AppError(400, "No slots fit in the requested window");
+  const lastSlot = slots[slots.length - 1];
+  if (lastSlot && lastSlot.end.getTime() <= Date.now())
+    throw new AppError(400, "Cannot generate a schedule in the past");
+
+  const batchId = randomUUID();
+
+  const result = await prisma.$transaction(async (tx) => {
+    await advisoryLock(
+      tx as unknown as Parameters<typeof advisoryLock>[0],
+      `schedule-generation:${input.zoneId}`,
+    );
+
+    const zone = await tx.zone.findFirst({
+      where: { id: input.zoneId, deletedAt: null },
+      select: { id: true, name: true },
+    });
+    if (!zone) throw new AppError(404, "Zone not found");
+
+    const feeders = await tx.feeder.findMany({
+      where: {
+        deletedAt: null,
+        loadMw: { gt: 0 },
+        status: { not: "FAULTED" },
+        priority: { not: PriorityLevel.CRITICAL },
+        substation: { zoneId: input.zoneId, deletedAt: null },
+      },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        loadMw: true,
+        priority: true,
+      },
+    });
+    if (feeders.length === 0)
+      throw new AppError(
+        422,
+        "No sheddable feeders (non-critical, loaded, healthy) in this zone",
+      );
+
+    const existing = await tx.scheduledOutage.findMany({
+      where: {
+        feederId: { in: feeders.map((f) => f.id) },
+        deletedAt: null,
+        status: {
+          in: [
+            ScheduleStatus.SCHEDULED,
+            ScheduleStatus.ACTIVE,
+            ScheduleStatus.COMPLETED,
+          ],
+        },
+        endTime: { gt: historyStart },
+        startTime: { lt: dayEnd },
+      },
+      select: { feederId: true, startTime: true, endTime: true, type: true },
+    });
+
+    const overlapHours = (aS: Date, aE: Date, bS: Date, bE: Date) =>
+      Math.max(
+        0,
+        Math.min(aE.getTime(), bE.getTime()) -
+          Math.max(aS.getTime(), bS.getTime()),
+      ) / HOUR_MS;
+
+    type FeederState = (typeof feeders)[number] & {
+      history: number;
+      today: number;
+      busy: Busy[];
+    };
+    const state = new Map<string, FeederState>(
+      feeders.map((f): [string, FeederState] => [
+        f.id,
+        { ...f, history: 0, today: 0, busy: [] },
+      ]),
+    );
+    for (const o of existing) {
+      const f = state.get(o.feederId);
+      if (!f) continue;
+      const shedding = o.type === ScheduleType.LOAD_SHEDDING;
+      if (shedding) {
+        f.history += overlapHours(
+          o.startTime,
+          o.endTime,
+          historyStart,
+          dayStart,
+        );
+        f.today += overlapHours(o.startTime, o.endTime, dayStart, dayEnd);
+      }
+      if (o.startTime < dayEnd && o.endTime > dayStart)
+        f.busy.push({ start: o.startTime, end: o.endTime, shedding });
+    }
+
+    let previous = new Set<string>();
+    const plan = slots.map((slot) => {
+      const overlaps = (b: Busy) => b.start < slot.end && b.end > slot.start;
+      const all = [...state.values()];
+
+      // Load already being shed in this slot by pre-existing load-shedding outages.
+      const alreadyShed = all
+        .filter((f) => f.busy.some((b) => b.shedding && overlaps(b)))
+        .reduce((s, f) => s + f.loadMw, 0);
+
+      const candidates = all
+        .filter(
+          (f) =>
+            f.today + input.slotHours <= input.maxShedHoursPerFeeder &&
+            !f.busy.some(overlaps),
+        )
+        .sort(
+          (a, b) =>
+            PRIORITY_WEIGHT[a.priority] - PRIORITY_WEIGHT[b.priority] ||
+            Number(previous.has(a.id)) - Number(previous.has(b.id)) ||
+            a.history + a.today - (b.history + b.today) ||
+            b.loadMw - a.loadMw,
+        );
+
+      let shed = alreadyShed;
+      const chosen: typeof candidates = [];
+      for (const f of candidates) {
+        if (shed >= input.deficitMw) break;
+        chosen.push(f);
+        shed += f.loadMw;
+        f.today += input.slotHours;
+      }
+      previous = new Set(chosen.map((f) => f.id));
+
+      return {
+        startTime: slot.start,
+        endTime: slot.end,
+        shedMw: round2(shed),
+        unmetDeficitMw: round2(Math.max(0, input.deficitMw - shed)),
+        feeders: chosen.map((f) => ({
+          feederId: f.id,
+          code: f.code,
+          name: f.name,
+          priority: f.priority,
+          loadMw: f.loadMw,
+        })),
+      };
+    });
+
+    const rows = plan.flatMap((slot) =>
+      slot.feeders.map((f) => ({
+        feederId: f.feederId,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        type: ScheduleType.LOAD_SHEDDING,
+        reason: input.reason,
+        batchId,
+        createdById: actor.id == null ? null : String(actor.id),
+      })),
+    );
+
+    if (!input.dryRun && rows.length > 0) {
+      await tx.scheduledOutage.createMany({ data: rows });
+      await audit(tx as unknown as Parameters<typeof audit>[0], actor, {
+        action: "SCHEDULE_GENERATED",
+        entity: "ScheduledOutage",
+        entityId: batchId as string,
+        metadata: {
+          zoneId: input.zoneId as string,
+          date: input.date as string,
+          deficitMw: input.deficitMw,
+          created: rows.length,
+        },
+      });
+    }
+
+    return {
+      batchId: input.dryRun ? null : batchId,
+      dryRun: input.dryRun,
+      zone,
+      date: input.date,
+      deficitMw: input.deficitMw,
+      summary: {
+        slots: plan.length,
+        outagesCreated: input.dryRun ? 0 : rows.length,
+        outagesPlanned: rows.length,
+        slotsWithUnmetDeficit: plan.filter((p) => p.unmetDeficitMw > 0).length,
+        protectedFeeders: "CRITICAL priority feeders are never shed",
+      },
+      plan,
+      rows,
+    };
+  });
+
+  if (!input.dryRun && result.rows.length > 0) {
+    fireAndForget(async () => {
+      const created = await prisma.scheduledOutage.findMany({
+        where: { batchId },
+        select: {
+          id: true,
+          feederId: true,
+          startTime: true,
+          endTime: true,
+          feeder: { select: { name: true } },
+        },
+        orderBy: { startTime: "asc" },
+      });
+      const byFeeder = Map.groupBy(created, (c) => c.feederId);
+      for (const [feederId, items] of byFeeder) {
+        const windows = items
+          .map((i) => describeWindow(i.startTime, i.endTime))
+          .join("; ");
+        const ids = await customerIdsFor({ feederId });
+        await notifyUsers(ids, {
+          type: "SCHEDULE",
+          title: "Load-shedding schedule published",
+          message: `${items[0]?.feeder.name}: ${windows}`,
+          refId: batchId,
+        });
+      }
+    });
+  }
+
+  const { rows: _rows, ...response } = result;
+  return response;
+};
+
+//  state machine (background job)
+export const syncScheduleStates = async () => {
+  const now = new Date();
+
+  const due = await prisma.scheduledOutage.findMany({
+    where: {
+      deletedAt: null,
+      status: ScheduleStatus.SCHEDULED,
+      startTime: { lte: now },
+      endTime: { gt: now },
+    },
+    select: { id: true, feederId: true, areaId: true },
+  });
+  if (due.length) {
+    await prisma.$transaction([
+      prisma.scheduledOutage.updateMany({
+        where: {
+          id: { in: due.map((d) => d.id) },
+          status: ScheduleStatus.SCHEDULED,
+        },
+        data: { status: ScheduleStatus.ACTIVE },
+      }),
+      prisma.feeder.updateMany({
+        where: {
+          id: { in: due.filter((d) => !d.areaId).map((d) => d.feederId) },
+          status: "ENERGIZED",
+        },
+        data: { status: "DE_ENERGIZED" },
+      }),
+    ]);
+  }
+
+  const finished = await prisma.scheduledOutage.findMany({
+    where: { deletedAt: null, status: { in: PENDING }, endTime: { lte: now } },
+    select: { id: true, feederId: true, areaId: true, status: true },
+  });
+  if (finished.length) {
+    await prisma.scheduledOutage.updateMany({
+      where: { id: { in: finished.map((f) => f.id) }, status: { in: PENDING } },
+      data: { status: ScheduleStatus.COMPLETED },
+    });
+    await restoreFeedersIfIdle(
+      finished
+        .filter((f) => f.status === ScheduleStatus.ACTIVE && !f.areaId)
+        .map((f) => f.feederId),
+    );
+  }
+
+  return { activated: due.length, completed: finished.length };
+};

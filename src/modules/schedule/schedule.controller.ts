@@ -11,6 +11,16 @@ export const create = catchAsync(async (req, res) => {
     data: await service.create(req.body, getActor(req)),
   });
 });
+export const generate = catchAsync(async (req, res) => {
+  const data = await service.generate(req.body, getActor(req));
+  sendResponse(res, {
+    statusCode: data.dryRun ? 200 : 201,
+    message: data.dryRun
+      ? "Schedule preview generated (nothing saved)"
+      : "Load-shedding schedule generated",
+    data,
+  });
+});
 
 export const list = catchAsync(async (req, res) => {
   const { items, meta } = await service.list(
@@ -43,5 +53,11 @@ export const cancel = catchAsync(async (req, res) => {
       req.body.reason,
       getActor(req),
     ),
+  });
+});
+export const remove = catchAsync(async (req, res) => {
+  sendResponse(res, {
+    message: "Outage deleted",
+    data: await service.softDelete(param(req, "id"), getActor(req)),
   });
 });
