@@ -120,6 +120,28 @@ const loadFeeder = async (feederId: string) => {
   if (!feeder) throw new AppError(404, "Feeder not found");
   return feeder;
 };
+const restoreFeedersIfIdle = async (feederIds: string[]) => {
+  const ids = [...new Set(feederIds)];
+  if (ids.length === 0) return;
+  const stillActive = await prisma.scheduledOutage.findMany({
+    where: {
+      feederId: { in: ids },
+      status: ScheduleStatus.ACTIVE,
+      areaId: null,
+      deletedAt: null,
+    },
+    select: { feederId: true },
+  });
+  const busy = new Set(stillActive.map((s) => s.feederId));
+  const restore = ids.filter((id) => !busy.has(id));
+  if (restore.length) {
+    await prisma.feeder.updateMany({
+      where: { id: { in: restore }, status: "DE_ENERGIZED" },
+      data: { status: "ENERGIZED" },
+    });
+  }
+};
+
 const getScheduleForActor = async (id: string) => {
   const row = await prisma.scheduledOutage.findFirst({
     where: { id, deletedAt: null },
@@ -334,6 +356,43 @@ export const reschedule = async (
     updated,
     "Planned outage rescheduled",
     `${current.feeder.name}: now ${describeWindow(start, end)}`,
+  );
+  return updated;
+};
+
+// Cancel schedule
+export const cancel = async (id: string, reason: string, actor: Actor) => {
+  const current = await getScheduleForActor(id);
+  await assertZoneAccess(actor, current.feeder.substation.zoneId);
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const { count } = await tx.scheduledOutage.updateMany({
+      where: { id, status: { in: PENDING }, deletedAt: null },
+      data: { status: ScheduleStatus.CANCELLED, cancelReason: reason },
+    });
+    if (count !== 1)
+      throw new AppError(
+        409,
+        `Cannot cancel an outage that is ${current.status}`,
+      );
+    await audit(tx as unknown as Parameters<typeof audit>[0], actor, {
+      action: "SCHEDULE_CANCELLED",
+      entity: "ScheduledOutage",
+      entityId: id,
+      metadata: { reason },
+    });
+    return tx.scheduledOutage.findUniqueOrThrow({
+      where: { id },
+      select: scheduleSelect,
+    });
+  });
+
+  if (current.status === ScheduleStatus.ACTIVE && !current.areaId)
+    await restoreFeedersIfIdle([current.feederId]);
+  notifyAffected(
+    updated,
+    "Planned outage cancelled",
+    `${current.feeder.name}: ${describeWindow(current.startTime, current.endTime)} was cancelled. ${reason}`,
   );
   return updated;
 };

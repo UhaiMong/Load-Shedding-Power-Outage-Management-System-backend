@@ -30,5 +30,11 @@ router.patch(
   validate({ params: idParamSchema, body: rescheduleSchema }),
   controller.reschedule,
 );
+router.post(
+  "/:id/cancel",
+  staff,
+  validate({ params: idParamSchema, body: cancelScheduleSchema }),
+  controller.cancel,
+);
 
 export default router;

@@ -35,3 +35,13 @@ export const reschedule = catchAsync(async (req, res) => {
     data: await service.reschedule(param(req, "id"), req.body, getActor(req)),
   });
 });
+export const cancel = catchAsync(async (req, res) => {
+  sendResponse(res, {
+    message: "Outage cancelled",
+    data: await service.cancel(
+      param(req, "id"),
+      req.body.reason,
+      getActor(req),
+    ),
+  });
+});
