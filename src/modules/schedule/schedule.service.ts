@@ -134,28 +134,34 @@ export const create = async (input: CreateScheduleInput, actor: Actor) => {
   }
 
   const created = await prisma.$transaction(async (tx) => {
-    await advisoryLock(tx, `feeder-schedule:${feeder.id}`);
-    const conflicts = await findConflicts(tx, {
-      feederId: feeder.id,
-      areaId: input.areaId,
-      start: input.startTime,
-      end: input.endTime,
-    });
+    await advisoryLock(
+      tx as unknown as Parameters<typeof advisoryLock>[0],
+      `feeder-schedule:${feeder.id}`,
+    );
+    const conflicts = await findConflicts(
+      tx as unknown as Parameters<typeof findConflicts>[0],
+      {
+        feederId: feeder.id as string,
+        areaId: input.areaId as string | null,
+        start: input.startTime,
+        end: input.endTime,
+      },
+    );
     if (conflicts.length) throwConflict(conflicts);
 
     const row = await tx.scheduledOutage.create({
       data: {
-        feederId: feeder.id,
-        areaId: input.areaId,
+        feederId: feeder.id as string,
+        areaId: input.areaId as string | null,
         startTime: input.startTime,
         endTime: input.endTime,
         type: input.type,
-        reason: input.reason,
-        createdById: actor.id,
+        reason: input.reason ?? null,
+        createdById: actor.id as string,
       },
       select: scheduleSelect,
     });
-    await audit(tx, actor, {
+    await audit(tx as unknown as Parameters<typeof audit>[0], actor, {
       action: "SCHEDULE_CREATED",
       entity: "ScheduledOutage",
       entityId: row.id,
