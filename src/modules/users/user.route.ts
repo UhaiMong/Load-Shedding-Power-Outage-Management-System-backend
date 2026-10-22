@@ -1,5 +1,7 @@
 import { Router } from "express";
+import { ROLE_GROUPS } from "../../config/roles";
 import { authenticate, authorize } from "../../middleware/authenticate";
+import { uploadImage } from "../../middleware/upload";
 import { validate } from "../../middleware/validate";
 import * as controller from "./user.controller";
 import {
@@ -7,7 +9,6 @@ import {
   listTechniciansQuery,
   updateMeSchema,
 } from "./user.validator";
-import { uploadImage } from "../../middleware/upload";
 
 const router = Router();
 router.use(authenticate);
@@ -19,11 +20,13 @@ router.post("/me/avatar", uploadImage.single("image"), controller.uploadAvatar);
 
 router.patch(
   "/me/availability",
+  authorize(...ROLE_GROUPS.TECHNICIAN),
   validate({ body: availabilitySchema }),
   controller.setAvailability,
 );
 router.get(
   "/technicians",
+  authorize(...ROLE_GROUPS.STAFF),
   validate({ query: listTechniciansQuery }),
   controller.listTechnicians,
 );

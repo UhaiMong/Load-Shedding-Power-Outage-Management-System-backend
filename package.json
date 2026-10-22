@@ -13,7 +13,8 @@
     "format:check": "npx biome format ./src",
     "format:fix": "npx biome format --write ./src",
     "lint:check": "npx biome lint ./src",
-    "lint:fix": "npx biome lint --write ./src"
+    "lint:fix": "npx biome lint --write ./src",
+    "db:seed": "tsx seed/seed.ts"
   },
   "keywords": [],
   "type": "module",
