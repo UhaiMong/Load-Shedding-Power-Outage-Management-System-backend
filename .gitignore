@@ -11,3 +11,5 @@ dist/
 skills-lock.json
 seed/*
 seed.ts
+
+.vercel
