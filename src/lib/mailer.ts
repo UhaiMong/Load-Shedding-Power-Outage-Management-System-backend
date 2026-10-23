@@ -12,16 +12,18 @@ const transporter = env.SMTP_HOST
     })
   : null;
 
-/** Best-effort email. */
+/** Best-effort email: never throws. */
 export const sendMail = async (
   to: string | string[],
   subject: string,
   text: string,
-) => {
-  if (!transporter) return;
+): Promise<boolean> => {
+  if (!transporter) return false;
   try {
     await transporter.sendMail({ from: env.SMTP_FROM, to, subject, text });
+    return true;
   } catch (err) {
     console.error("[mail]", err instanceof Error ? err.message : err);
+    return false;
   }
 };
