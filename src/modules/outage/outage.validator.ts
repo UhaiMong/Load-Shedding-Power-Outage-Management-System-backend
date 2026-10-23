@@ -1,4 +1,4 @@
-import { OutageStatus, PriorityLevel } from "@generated/prisma/enums";
+import { OutageStatus, PriorityLevel } from "../../../generated/prisma/enums";
 import { z } from "zod";
 import { paginationSchema } from "../../utils/pagination";
 

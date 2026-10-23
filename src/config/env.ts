@@ -53,13 +53,19 @@ const schema = z.object({
   BKASH_WEBHOOK_SECRET: optional,
 });
 
-const parsed = schema.safeParse(process.env);
+const rawEnv = Object.fromEntries(
+  Object.entries(process.env).map(([key, value]) => [
+    key,
+    typeof value === "string" && value.trim() === "" ? undefined : value,
+  ]),
+);
+
+const parsed = schema.safeParse(rawEnv);
 
 if (!parsed.success) {
-  console.error(
-    `Invalid environment configuration:\n${z.prettifyError(parsed.error)}`,
-  );
-  process.exit(1);
+  const message = `Invalid environment configuration:\n${z.prettifyError(parsed.error)}`;
+  console.error(message);
+  throw new Error(message);
 }
 
 export const env = parsed.data;

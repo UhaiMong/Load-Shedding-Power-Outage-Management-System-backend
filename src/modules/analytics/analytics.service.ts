@@ -1,4 +1,4 @@
-import { Prisma } from "@generated/prisma/client";
+import { Prisma } from "../../../generated/prisma/client";
 import { cache } from "../../lib/cache";
 import { prisma } from "../../lib/prisma";
 import type { AnalyticsQuery } from "./analytics.validator";

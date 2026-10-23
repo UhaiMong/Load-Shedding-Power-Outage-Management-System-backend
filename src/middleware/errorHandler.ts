@@ -1,4 +1,4 @@
-import { Prisma } from "@generated/prisma/client";
+import { Prisma } from "../../generated/prisma/client";
 import type { ErrorRequestHandler, RequestHandler } from "express";
 import multer from "multer";
 import { ZodError } from "zod";

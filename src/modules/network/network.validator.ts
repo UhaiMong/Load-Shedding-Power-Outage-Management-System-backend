@@ -1,4 +1,4 @@
-import { AreaType, FeederStatus, PriorityLevel } from "@generated/prisma/enums";
+import { AreaType, FeederStatus, PriorityLevel } from "../../../generated/prisma/enums";
 import { z } from "zod";
 import { orderSchema, paginationSchema } from "../../utils/pagination";
 

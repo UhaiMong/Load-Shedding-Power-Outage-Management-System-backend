@@ -1,6 +1,6 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
-import type { Prisma } from "@generated/prisma/client";
-import { BillStatus, PaymentStatus, Role } from "@generated/prisma/enums";
+import type { Prisma } from "../../../generated/prisma/client";
+import { BillStatus, PaymentStatus, Role } from "../../../generated/prisma/enums";
 import { env } from "../../config/env";
 import { type BkashResponse, bkash } from "../../lib/bkash";
 import { cache } from "../../lib/cache";

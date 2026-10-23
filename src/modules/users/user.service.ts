@@ -1,5 +1,5 @@
-import type { Prisma } from "@generated/prisma/client";
-import { Role } from "@generated/prisma/enums";
+import type { Prisma } from "../../../generated/prisma/client";
+import { Role } from "../../../generated/prisma/enums";
 import { uploadImage } from "../../lib/cloudinary";
 
 import { prisma } from "../../lib/prisma";

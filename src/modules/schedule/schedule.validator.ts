@@ -1,4 +1,4 @@
-import { ScheduleStatus, ScheduleType } from "@generated/prisma/enums";
+import { ScheduleStatus, ScheduleType } from "../../../generated/prisma/enums";
 import { z } from "zod";
 import { paginationSchema } from "../../utils/pagination";
 

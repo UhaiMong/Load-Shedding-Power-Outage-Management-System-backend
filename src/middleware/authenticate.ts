@@ -1,4 +1,4 @@
-import type { Role } from "@generated/prisma/enums";
+import type { Role } from "../../generated/prisma/enums";
 import { fromNodeHeaders } from "better-auth/node";
 import type { Request, RequestHandler } from "express";
 import { auth } from "../lib/auth";

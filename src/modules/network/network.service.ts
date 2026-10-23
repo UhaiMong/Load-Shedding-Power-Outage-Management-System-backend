@@ -1,5 +1,5 @@
-import type { Prisma } from "@generated/prisma/client";
-import { Role, ScheduleStatus } from "@generated/prisma/enums";
+import type { Prisma } from "../../../generated/prisma/client";
+import { Role, ScheduleStatus } from "../../../generated/prisma/enums";
 import { cache } from "../../lib/cache";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/ApiError";

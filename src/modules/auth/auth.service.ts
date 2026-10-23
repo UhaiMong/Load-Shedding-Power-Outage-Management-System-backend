@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingHttpHeaders } from "node:http";
-import type { Prisma } from "@generated/prisma/client";
+import type { Prisma } from "../../../generated/prisma/client";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../../lib/auth";
 import * as otp from "../../lib/otp";

@@ -1,11 +1,11 @@
-import type { Prisma } from "@generated/prisma/client";
+import type { Prisma } from "../../../generated/prisma/client";
 import {
   BillStatus,
   OutageStatus,
   PaymentStatus,
   Role,
   ScheduleStatus,
-} from "@generated/prisma/enums";
+} from "../../../generated/prisma/enums";
 import { auth } from "../../lib/auth";
 import { cache } from "../../lib/cache";
 import { prisma } from "../../lib/prisma";

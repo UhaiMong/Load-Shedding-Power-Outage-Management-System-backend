@@ -1,4 +1,4 @@
-import { PaymentStatus } from "@generated/prisma/enums";
+import { PaymentStatus } from "../../../generated/prisma/enums";
 import { z } from "zod";
 import { orderSchema, paginationSchema } from "../../utils/pagination";
 

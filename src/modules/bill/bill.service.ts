@@ -1,5 +1,5 @@
-import type { Prisma } from "@generated/prisma/client";
-import { BillStatus, Role } from "@generated/prisma/enums";
+import type { Prisma } from "../../../generated/prisma/client";
+import { BillStatus, Role } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/ApiError";
 import { type Actor, audit } from "../../utils/audit";

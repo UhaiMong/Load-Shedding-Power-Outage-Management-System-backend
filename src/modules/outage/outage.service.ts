@@ -1,5 +1,5 @@
-import type { Prisma } from "@generated/prisma/client";
-import { OutageStatus, Role, ScheduleStatus } from "@generated/prisma/enums";
+import type { Prisma } from "../../../generated/prisma/client";
+import { OutageStatus, Role, ScheduleStatus } from "../../../generated/prisma/enums";
 import { uploadImage } from "../../lib/cloudinary";
 import { sendMail } from "../../lib/mailer";
 import { prisma } from "../../lib/prisma";

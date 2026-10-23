@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import type { Prisma } from "@generated/prisma/client";
+import type { Prisma } from "../../../generated/prisma/client";
 import {
   PriorityLevel,
   Role,
   ScheduleStatus,
   ScheduleType,
-} from "@generated/prisma/client";
+} from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/ApiError";
 import { type Actor, audit, type Db } from "../../utils/audit";
