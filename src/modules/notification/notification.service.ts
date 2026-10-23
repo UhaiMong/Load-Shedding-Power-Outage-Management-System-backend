@@ -1,9 +1,9 @@
-import { type NotificationType, Role } from "../../../generated/prisma/enums";
+import { type NotificationType, Role } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/ApiError";
 import type { Db } from "../../utils/audit";
 import { buildMeta, getSkipTake } from "../../utils/pagination";
-// import type { ListNotificationsQuery } from "./notification.validator";
+import type { ListNotificationsQuery } from "./notification.validator";
 
 interface Payload {
   type: NotificationType;
@@ -16,7 +16,7 @@ interface Payload {
 export const notifyUsers = async (
   userIds: string[],
   payload: Payload,
-  db: Db = prisma,
+  db: Db = prisma as unknown as Db,
 ) => {
   const ids = [...new Set(userIds)];
   if (ids.length === 0) return 0;
@@ -63,7 +63,10 @@ export const staffIdsForZone = async (zoneId: string) => {
   return users.map((u) => u.id);
 };
 
-export const listMine = async (userId: string, query: any) => {
+export const listMine = async (
+  userId: string,
+  query: ListNotificationsQuery,
+) => {
   const where = { userId, ...(query.unreadOnly ? { isRead: false } : {}) };
   const [items, total, unreadCount] = await Promise.all([
     prisma.notification.findMany({
