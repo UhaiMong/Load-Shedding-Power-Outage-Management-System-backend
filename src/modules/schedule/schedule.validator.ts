@@ -1,5 +1,5 @@
+import { ScheduleStatus, ScheduleType } from "@generated/prisma/enums";
 import { z } from "zod";
-import { ScheduleStatus, ScheduleType } from "../../../generated/prisma/enums";
 import { paginationSchema } from "../../utils/pagination";
 
 export const idParamSchema = z.object({ id: z.string().min(1) });

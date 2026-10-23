@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    // "rootDir": "./src",
-    // "outDir": "./dist",
+    "paths": {
+      "@generated/*": ["./generated/*"]
+    },
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "es2023",

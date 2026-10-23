@@ -1,4 +1,4 @@
-import { type NotificationType, Role } from "@prisma/client";
+import { type NotificationType, Role } from "@generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/ApiError";
 import type { Db } from "../../utils/audit";

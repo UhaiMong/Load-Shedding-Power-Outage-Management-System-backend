@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@generated/prisma/client";
 import {
   PriorityLevel,
   Role,
   ScheduleStatus,
   ScheduleType,
-} from "../../../generated/prisma/enums";
+} from "@generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/ApiError";
 import { type Actor, audit, type Db } from "../../utils/audit";
@@ -234,7 +234,10 @@ export const create = async (input: CreateScheduleInput, actor: Actor) => {
 };
 // schedule listing
 export const list = async (query: ListSchedulesQuery, actor: Actor) => {
-  const AND: Prisma.ScheduledOutageWhereInput[] = [{ deletedAt: null }];
+  type ScheduleWhere = NonNullable<
+    NonNullable<Parameters<typeof prisma.scheduledOutage.findMany>[0]>["where"]
+  >;
+  const AND: ScheduleWhere[] = [{ deletedAt: null }];
 
   if (actor.role === Role.CUSTOMER) {
     const profile = await prisma.profile.findUnique({
@@ -274,7 +277,7 @@ export const list = async (query: ListSchedulesQuery, actor: Actor) => {
     });
   if (query.q) AND.push({ reason: containsInsensitive(query.q) });
 
-  const where: Prisma.ScheduledOutageWhereInput = { AND };
+  const where: ScheduleWhere = { AND };
   const [items, total] = await Promise.all([
     prisma.scheduledOutage.findMany({
       where,

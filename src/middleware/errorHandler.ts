@@ -1,8 +1,8 @@
+import { Prisma } from "@generated/prisma/client";
 import type { ErrorRequestHandler, RequestHandler } from "express";
 import multer from "multer";
 import { ZodError } from "zod";
 import { isProd } from "../config/env";
-import { Prisma } from "../../generated/prisma/client";
 import { AppError } from "../utils/ApiError";
 
 interface Normalized {

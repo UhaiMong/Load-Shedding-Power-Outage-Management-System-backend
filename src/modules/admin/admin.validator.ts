@@ -1,5 +1,5 @@
+import { Role } from "@generated/prisma/enums";
 import { z } from "zod";
-import { Role } from "../../../generated/prisma/enums";
 import { orderSchema, paginationSchema } from "../../utils/pagination";
 
 export const idParamSchema = z.object({ id: z.string().min(1) });

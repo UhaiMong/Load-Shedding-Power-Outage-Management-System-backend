@@ -1,11 +1,11 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@generated/prisma/client";
 import {
   BillStatus,
   OutageStatus,
   PaymentStatus,
   Role,
   ScheduleStatus,
-} from "../../../generated/prisma/enums";
+} from "@generated/prisma/enums";
 import { auth } from "../../lib/auth";
 import { cache } from "../../lib/cache";
 import { prisma } from "../../lib/prisma";
@@ -49,7 +49,7 @@ const assertNotSelf = (actor: Actor, id: string) => {
 };
 
 export const listUsers = async (query: ListUsersQuery) => {
-  const where: Prisma.UserWhereInput = {
+  const where = {
     ...(query.includeDeleted ? {} : { deletedAt: null }),
     ...(query.role ? { role: query.role } : {}),
     ...(query.isActive !== undefined ? { isActive: query.isActive } : {}),
@@ -61,7 +61,7 @@ export const listUsers = async (query: ListUsersQuery) => {
           ],
         }
       : {}),
-  };
+  } satisfies NonNullable<Parameters<typeof prisma.user.findMany>[0]>["where"];
   const [items, total] = await Promise.all([
     prisma.user.findMany({
       where,
@@ -306,7 +306,7 @@ export const dashboardStats = () =>
   });
 
 export const listAuditLogs = async (query: AuditLogsQuery) => {
-  const where: Prisma.AuditLogWhereInput = {
+  const where = {
     ...(query.entity ? { entity: query.entity } : {}),
     ...(query.entityId ? { entityId: query.entityId } : {}),
     ...(query.action ? { action: query.action } : {}),
@@ -319,7 +319,9 @@ export const listAuditLogs = async (query: AuditLogsQuery) => {
           },
         }
       : {}),
-  };
+  } satisfies NonNullable<
+    Parameters<typeof prisma.auditLog.findMany>[0]
+  >["where"];
   const [items, total] = await Promise.all([
     prisma.auditLog.findMany({
       where,
