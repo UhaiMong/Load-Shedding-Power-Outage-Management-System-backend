@@ -1,0 +1,3436 @@
+{
+  "info": {
+    "_postman_id": "55da0712-b2e3-4e8e-8aea-986bbd6a633f",
+    "name": "Load Shedding & Power Outage Management API",
+    "description": "Run the Login requests in the 'auth' folder first - tokens and ids are saved to collection variables automatically. Seed accounts use password Password@123.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50662672",
+    "_collection_link": "https://go.postman.co/collection/50662672-55da0712-b2e3-4e8e-8aea-986bbd6a633f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "Register (customer) - sends a 6-digit OTP to the email, no token yet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Uhai\",\n  \"email\": \"uhaimong.dev@gmail.com\",\n  \"password\": \"Admin@885\",\n  \"phone\": \"+8801711111111\",\n  \"address\": \"House 12, Road 4, Sector 10\",\n  \"meterNumber\": \"MTR-1001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Access: Public"
+          },
+          "response": []
+        },
+        {
+          "name": "Resend verification OTP (60s cooldown, max 5 per hour)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"uhaimong.dev@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/resend-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "resend-otp"
+              ]
+            },
+            "description": "Access: Public"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify email with OTP (logs the user in)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();\nif (j.data && j.data.token !== undefined) pm.collectionVariables.set('newCustomerToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"uhaimong.dev@gmail.com\",\n  \"otp\": \"{{otp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify-email",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify-email"
+              ]
+            },
+            "description": "Access: Public (OTP from email; paste it into the `otp` collection variable)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();\nif (j.data && j.data.token !== undefined) pm.collectionVariables.set('adminToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@loadsheddin.com\",\n  \"password\": \"Admin@885\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Access: Public (email must be verified)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Operator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();\nif (j.data && j.data.token !== undefined) pm.collectionVariables.set('operatorToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"operator@loadsheddin.com\",\n  \"password\": \"Admin@885\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Access: Public (email must be verified)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Zone Manager)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();\nif (j.data && j.data.token !== undefined) pm.collectionVariables.set('managerToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@loadsheddin.com\",\n  \"password\": \"Admin@885\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Access: Public (email must be verified)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Technician)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();\nif (j.data && j.data.token !== undefined) pm.collectionVariables.set('techToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tech1@example.com\",\n  \"password\": \"Admin@885\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Access: Public (email must be verified)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();\nif (j.data && j.data.token !== undefined) pm.collectionVariables.set('customerToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"uhaimong.me@gmail.com\",\n  \"password\": \"Admin@885\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Access: Public (email must be verified)"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh token (rotates session, old token stops working)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.token !== undefined) pm.collectionVariables.set('newCustomerToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{newCustomerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            },
+            "description": "Access: Any logged-in user (use the token from Verify email)"
+          },
+          "response": []
+        },
+        {
+          "name": "Change password - step 1: send OTP to my email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{newCustomerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password/send-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "change-password",
+                "send-otp"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Change password - step 2: confirm with OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{newCustomerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": \"{{otp}}\",\n  \"currentPassword\": \"Passw0rd123\",\n  \"newPassword\": \"Passw0rd456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Access: Any logged-in user (OTP from email in `otp` variable)"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{newCustomerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot password - sends OTP (always answers 200, never reveals if the email exists)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rahim@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Access: Public"
+          },
+          "response": []
+        },
+        {
+          "name": "Reset password with OTP (signs out all sessions)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rahim@example.com\",\n  \"otp\": \"{{otp}}\",\n  \"newPassword\": \"Passw0rd789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Access: Public (OTP from email in `otp` variable)"
+          },
+          "response": []
+        },
+        {
+          "name": "Login (new customer created by Register, after reset)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();\nif (j.data && j.data.token !== undefined) pm.collectionVariables.set('newCustomerToken', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"uhaimong.dev@gmail.com\",\n  \"password\": \"Admin@885\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Access: Public"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "network",
+      "item": [
+        {
+          "name": "zones",
+          "item": [
+            {
+              "name": "Create zone",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('newZoneId', j.data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Dhaka South\",\n  \"code\": \"DHK-S\",\n  \"description\": \"Dhaka South distribution zone\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/zones",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "zones"
+                  ]
+                },
+                "description": "Access: ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "List zones",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('zoneId', j.data[0].id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/zones?q=dhaka&sortBy=name&order=asc&page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "zones"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "dhaka"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "name"
+                    },
+                    {
+                      "key": "order",
+                      "value": "asc"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Get zone",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/zones/{{zoneId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "zones",
+                    "{{zoneId}}"
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Update zone",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"Updated zone description\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/zones/{{zoneId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "zones",
+                    "{{zoneId}}"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete zone (soft delete)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/zones/{{newZoneId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "zones",
+                    "{{newZoneId}}"
+                  ]
+                },
+                "description": "Access: ADMIN"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "substations",
+          "item": [
+            {
+              "name": "Create substation",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('newSubstationId', j.data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"zoneId\": \"{{zoneId}}\",\n  \"name\": \"Gulshan Substation\",\n  \"code\": \"SS-GULSHAN\",\n  \"capacityMw\": 80\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/substations",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "substations"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "List substations",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('substationId', j.data[0].id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/substations?zoneId={{zoneId}}&q=uttara&sortBy=capacityMw&order=desc&page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "substations"
+                  ],
+                  "query": [
+                    {
+                      "key": "zoneId",
+                      "value": "{{zoneId}}"
+                    },
+                    {
+                      "key": "q",
+                      "value": "uttara"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "capacityMw"
+                    },
+                    {
+                      "key": "order",
+                      "value": "desc"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Get substation",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/substations/{{substationId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "substations",
+                    "{{substationId}}"
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Update substation",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Gulshan Main Substation\",\n  \"capacityMw\": 90\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/substations/{{newSubstationId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "substations",
+                    "{{newSubstationId}}"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete substation (soft delete)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/substations/{{newSubstationId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "substations",
+                    "{{newSubstationId}}"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "feeders",
+          "item": [
+            {
+              "name": "Create feeder",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('testFeederId', j.data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"substationId\": \"{{substationId}}\",\n  \"name\": \"Test Feeder\",\n  \"code\": \"F-TEST\",\n  \"capacityMw\": 25,\n  \"loadMw\": 10,\n  \"priority\": \"LOW\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/feeders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "feeders"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "List feeders",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('feederId', j.data[0].id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{operatorToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/feeders?priority=LOW&status=ENERGIZED&sortBy=loadMw&order=desc&page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "feeders"
+                  ],
+                  "query": [
+                    {
+                      "key": "priority",
+                      "value": "LOW"
+                    },
+                    {
+                      "key": "status",
+                      "value": "ENERGIZED"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "loadMw"
+                    },
+                    {
+                      "key": "order",
+                      "value": "desc"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Get feeder",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{operatorToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/feeders/{{feederId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "feeders",
+                    "{{feederId}}"
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Update feeder",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Feeder Updated\",\n  \"priority\": \"MEDIUM\",\n  \"status\": \"ENERGIZED\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/feeders/{{testFeederId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "feeders",
+                    "{{testFeederId}}"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "Update live load reading",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{operatorToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"loadMw\": 15,\n  \"status\": \"ENERGIZED\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/feeders/{{feederId}}/load",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "feeders",
+                    "{{feederId}}",
+                    "load"
+                  ]
+                },
+                "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete feeder (soft delete)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/feeders/{{testFeederId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "feeders",
+                    "{{testFeederId}}"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "areas",
+          "item": [
+            {
+              "name": "Create area",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('newAreaId', j.data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"feederId\": \"{{feederId}}\",\n  \"name\": \"Sector 14\",\n  \"code\": \"A-SEC14\",\n  \"type\": \"RESIDENTIAL\",\n  \"customerCount\": 800,\n  \"address\": \"Sector 14, Uttara\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/areas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "areas"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "List areas",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const j = pm.response.json();",
+                      "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('areaId', j.data[0].id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customerToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/areas?q=sector&type=RESIDENTIAL&sortBy=name&order=asc&page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "areas"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "sector"
+                    },
+                    {
+                      "key": "type",
+                      "value": "RESIDENTIAL"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "name"
+                    },
+                    {
+                      "key": "order",
+                      "value": "asc"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Get area",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customerToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/areas/{{areaId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "areas",
+                    "{{areaId}}"
+                  ]
+                },
+                "description": "Access: Any logged-in user"
+              },
+              "response": []
+            },
+            {
+              "name": "Update area",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sector 14 Updated\",\n  \"customerCount\": 900\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/areas/{{newAreaId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "areas",
+                    "{{newAreaId}}"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete area (soft delete)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{managerToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/areas/{{newAreaId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "areas",
+                    "{{newAreaId}}"
+                  ]
+                },
+                "description": "Access: ZONE_MANAGER (own zone) / ADMIN"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "item": [
+        {
+          "name": "Get my profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Update my profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Customer\",\n  \"phone\": \"+8801700000010\",\n  \"address\": \"House 12, Road 4, Sector 10\",\n  \"areaId\": \"{{areaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload avatar (multipart/form-data, Cloudinary)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me/avatar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "avatar"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Set my availability (on-duty toggle)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{techToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isAvailable\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me/availability",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "availability"
+              ]
+            },
+            "description": "Access: TECHNICIAN"
+          },
+          "response": []
+        },
+        {
+          "name": "List technicians (pagination + filters)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('technicianId', j.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/technicians?available=true&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "technicians"
+              ],
+              "query": [
+                {
+                  "key": "available",
+                  "value": "true"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete my account (soft delete, logs me out everywhere)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{newCustomerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            },
+            "description": "Access: Any logged-in user (not ADMIN) - demo uses the throwaway Register user"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "item": [
+        {
+          "name": "List users (search / filter / sort / pagination)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('customerId', j.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?q=demo&role=CUSTOMER&isActive=true&sortBy=name&order=asc&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "demo"
+                },
+                {
+                  "key": "role",
+                  "value": "CUSTOMER"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "name"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Create staff account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('staffId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Operator\",\n  \"email\": \"operator2@example.com\",\n  \"password\": \"Passw0rd123\",\n  \"role\": \"OPERATOR\",\n  \"phone\": \"+8801700000099\",\n  \"zoneId\": \"{{zoneId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Get user by id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{staffId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{staffId}}"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Change user role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"TECHNICIAN\",\n  \"zoneId\": \"{{zoneId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{staffId}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{staffId}}",
+                "role"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Activate / deactivate user",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{staffId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{staffId}}",
+                "status"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete user (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{staffId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{staffId}}"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Dashboard statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard-stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "dashboard-stats"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Audit logs (filters + pagination)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/audit-logs?entity=Outage&action=OUTAGE_VERIFIED&page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "audit-logs"
+              ],
+              "query": [
+                {
+                  "key": "entity",
+                  "value": "Outage"
+                },
+                {
+                  "key": "action",
+                  "value": "OUTAGE_VERIFIED"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "schedule",
+      "item": [
+        {
+          "name": "Create planned outage (conflict-checked)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('scheduleId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feederId\": \"{{feederId}}\",\n  \"startTime\": \"2030-01-01T10:00:00.000Z\",\n  \"endTime\": \"2030-01-01T12:00:00.000Z\",\n  \"type\": \"MAINTENANCE\",\n  \"reason\": \"Transformer maintenance\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate load-shedding schedule - preview only (dryRun)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zoneId\": \"{{zoneId}}\",\n  \"date\": \"2030-01-02\",\n  \"deficitMw\": 20,\n  \"startHour\": 8,\n  \"endHour\": 22,\n  \"slotHours\": 2,\n  \"maxShedHoursPerFeeder\": 4,\n  \"utcOffsetMinutes\": 360,\n  \"dryRun\": true,\n  \"reason\": \"Gas supply shortage\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedules/generate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules",
+                "generate"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate load-shedding schedule - save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zoneId\": \"{{zoneId}}\",\n  \"date\": \"2030-01-02\",\n  \"deficitMw\": 20,\n  \"startHour\": 8,\n  \"endHour\": 22,\n  \"slotHours\": 2,\n  \"maxShedHoursPerFeeder\": 4,\n  \"utcOffsetMinutes\": 360,\n  \"dryRun\": false,\n  \"reason\": \"Gas supply shortage\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedules/generate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules",
+                "generate"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "List schedules (customers only see their own feeder/area)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedules?status=SCHEDULED&type=LOAD_SHEDDING&from=2030-01-01&to=2030-12-31&sortBy=startTime&order=asc&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SCHEDULED"
+                },
+                {
+                  "key": "type",
+                  "value": "LOAD_SHEDDING"
+                },
+                {
+                  "key": "from",
+                  "value": "2030-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2030-12-31"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "startTime"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get schedule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedules/{{scheduleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules",
+                "{{scheduleId}}"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Reschedule (only SCHEDULED)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"2030-01-01T11:00:00.000Z\",\n  \"endTime\": \"2030-01-01T13:00:00.000Z\",\n  \"reason\": \"Moved by one hour\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedules/{{scheduleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules",
+                "{{scheduleId}}"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel schedule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Work postponed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedules/{{scheduleId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules",
+                "{{scheduleId}}",
+                "cancel"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete schedule (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedules/{{scheduleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "schedules",
+                "{{scheduleId}}"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "outage",
+      "item": [
+        {
+          "name": "Report outage (multipart/form-data, image optional)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('outageId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "description",
+                  "value": "No electricity since 8pm in Sector 10",
+                  "type": "text"
+                },
+                {
+                  "key": "areaId",
+                  "value": "{{areaId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/outages/report",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "report"
+              ]
+            },
+            "description": "Access: CUSTOMER"
+          },
+          "response": []
+        },
+        {
+          "name": "List outages (role-scoped, filters + pagination)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('outageId', j.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/outages?status=REPORTED&severity=MEDIUM&sortBy=startedAt&order=desc&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "REPORTED"
+                },
+                {
+                  "key": "severity",
+                  "value": "MEDIUM"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "startedAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "My reported outages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/outages/my-reports?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "my-reports"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: CUSTOMER"
+          },
+          "response": []
+        },
+        {
+          "name": "My assigned outages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{techToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/outages/my-assigned?status=ASSIGNED&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "my-assigned"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ASSIGNED"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: TECHNICIAN"
+          },
+          "response": []
+        },
+        {
+          "name": "Get outage",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}"
+              ]
+            },
+            "description": "Access: Any logged-in user (scoped)"
+          },
+          "response": []
+        },
+        {
+          "name": "Outage timeline (audit trail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}/timeline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}",
+                "timeline"
+              ]
+            },
+            "description": "Access: Any logged-in user (scoped)"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify outage (REPORTED -> VERIFIED)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"severity\": \"HIGH\",\n  \"cause\": \"Transformer fault\",\n  \"estimatedRestorationAt\": \"2030-01-01T18:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}",
+                "verify"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Assign technician (VERIFIED -> ASSIGNED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"technicianId\": \"{{technicianId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}/assign",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}",
+                "assign"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Technician: start repair (ASSIGNED -> IN_PROGRESS)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{techToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"notes\": \"Reached the site\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}",
+                "status"
+              ]
+            },
+            "description": "Access: TECHNICIAN (assigned)"
+          },
+          "response": []
+        },
+        {
+          "name": "Technician: mark restored (IN_PROGRESS -> RESTORED)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{techToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RESTORED\",\n  \"notes\": \"Replaced blown fuse\",\n  \"cause\": \"Blown HT fuse\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}",
+                "status"
+              ]
+            },
+            "description": "Access: TECHNICIAN (assigned)"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject outage (alternative to Assign - only for REPORTED/VERIFIED outages)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer-side fault, not a grid outage\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}",
+                "reject"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Auto-assign best available technician (alternative to manual Assign - only for VERIFIED outages)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}/auto-assign",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}",
+                "auto-assign"
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete outage (soft delete, RESTORED/REJECTED only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/outages/{{outageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "outages",
+                "{{outageId}}"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "notification",
+      "item": [
+        {
+          "name": "My notifications",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('notificationId', j.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications?unreadOnly=true&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "unreadOnly",
+                  "value": "true"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark one as read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "{{notificationId}}",
+                "read"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark all as read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
+            },
+            "description": "Access: Any logged-in user"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "bill",
+      "item": [
+        {
+          "name": "Create bill (tiered tariff calculated server-side)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('billId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"billingMonth\": \"2030-01\",\n  \"units\": 250,\n  \"dueDate\": \"2030-02-15T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bills",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bills"
+              ]
+            },
+            "description": "Access: OPERATOR / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "List bills (customers see only their own)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data[0].id !== undefined) pm.collectionVariables.set('billId', j.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bills?status=UNPAID&month=2030-01&sortBy=dueDate&order=asc&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bills"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "UNPAID"
+                },
+                {
+                  "key": "month",
+                  "value": "2030-01"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "dueDate"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: CUSTOMER / OPERATOR / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Get bill",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bills/{{billId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bills",
+                "{{billId}}"
+              ]
+            },
+            "description": "Access: CUSTOMER / OPERATOR / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Create bill (second bill, used for the delete demo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('tempBillId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"billingMonth\": \"2030-02\",\n  \"units\": 120,\n  \"dueDate\": \"2030-03-15T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bills",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bills"
+              ]
+            },
+            "description": "Access: OPERATOR / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete bill (soft delete, unpaid only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bills/{{tempBillId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bills",
+                "{{tempBillId}}"
+              ]
+            },
+            "description": "Access: ADMIN"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "payment",
+      "item": [
+        {
+          "name": "Initiate bKash payment (open data.bkashUrl in a browser)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.id !== undefined) pm.collectionVariables.set('paymentId', j.data.id);",
+                  "if (j.data && j.data.bkashPaymentId !== undefined) pm.collectionVariables.set('bkashPaymentId', j.data.bkashPaymentId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"billId\": \"{{billId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "initiate"
+              ]
+            },
+            "description": "Access: CUSTOMER"
+          },
+          "response": []
+        },
+        {
+          "name": "bKash callback (bKash redirects the browser here)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payments/callback/{{paymentId}}?paymentID={{bkashPaymentId}}&status=success",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "callback",
+                "{{paymentId}}"
+              ],
+              "query": [
+                {
+                  "key": "paymentID",
+                  "value": "{{bkashPaymentId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "success"
+                }
+              ]
+            },
+            "description": "Access: Public (called by bKash)"
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook (re-verifies with bKash; header x-webhook-secret required)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-webhook-secret",
+                "value": "{{webhookSecret}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentID\": \"{{bkashPaymentId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "webhook"
+              ]
+            },
+            "description": "Access: Public + secret header"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify payment (re-query bKash)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/{{paymentId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "{{paymentId}}",
+                "verify"
+              ]
+            },
+            "description": "Access: CUSTOMER / OPERATOR / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "List payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments?status=COMPLETED&sortBy=createdAt&order=desc&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: CUSTOMER / OPERATOR / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Get payment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/{{paymentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "{{paymentId}}"
+              ]
+            },
+            "description": "Access: CUSTOMER / OPERATOR / ADMIN"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "analytics",
+      "item": [
+        {
+          "name": "Outage summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/outage-summary?from=2026-01-01&to=2030-12-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "outage-summary"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2030-12-31"
+                }
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Area reliability (worst areas first)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/area-reliability?from=2026-01-01&to=2030-12-31&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "area-reliability"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2030-12-31"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Technician performance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{operatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/technician-performance?from=2026-01-01&to=2030-12-31&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "technician-performance"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2030-12-31"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Access: OPERATOR / ZONE_MANAGER / ADMIN"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1"
+    },
+    {
+      "key": "webhookSecret",
+      "value": ""
+    },
+    {
+      "key": "otp",
+      "value": ""
+    },
+    {
+      "key": "operatorToken",
+      "value": ""
+    },
+    {
+      "key": "newCustomerToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "customerId",
+      "value": ""
+    },
+    {
+      "key": "newZoneId",
+      "value": ""
+    },
+    {
+      "key": "staffId",
+      "value": ""
+    },
+    {
+      "key": "billId",
+      "value": ""
+    },
+    {
+      "key": "paymentId",
+      "value": ""
+    },
+    {
+      "key": "bkashPaymentId",
+      "value": ""
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "managerToken",
+      "value": ""
+    },
+    {
+      "key": "techToken",
+      "value": ""
+    }
+  ]
+}
