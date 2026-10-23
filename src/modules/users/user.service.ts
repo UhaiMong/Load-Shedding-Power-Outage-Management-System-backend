@@ -1,14 +1,14 @@
-import type { Prisma } from "../../../generated/prisma/client";
-import { Role } from "../../../generated/prisma/enums";
-import { uploadImage } from "../../lib/cloudinary";
+import type { Prisma } from "../../../generated/prisma/client.js";
+import { Role } from "../../../generated/prisma/enums.js";
+import { uploadImage } from "../../lib/cloudinary.js";
 
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import { type Actor, audit } from "../../utils/audit";
-import { containsInsensitive } from "../../utils/helpers";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import { type Actor, audit } from "../../utils/audit.js";
+import { containsInsensitive } from "../../utils/helpers.js";
 
-import { buildMeta, getSkipTake } from "../../utils/pagination";
-import type { ListTechniciansQuery, UpdateMeInput } from "./user.validator";
+import { buildMeta, getSkipTake } from "../../utils/pagination.js";
+import type { ListTechniciansQuery, UpdateMeInput } from "./user.validator.js";
 
 export const meSelect = {
   id: true,

@@ -1,9 +1,9 @@
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma } from "../../generated/prisma/client.js";
 import type { ErrorRequestHandler, RequestHandler } from "express";
 import multer from "multer";
 import { ZodError } from "zod";
-import { isProd } from "../config/env";
-import { AppError } from "../utils/ApiError";
+import { isProd } from "../config/env.js";
+import { AppError } from "../utils/ApiError.js";
 
 interface Normalized {
   statusCode: number;

@@ -1,33 +1,33 @@
 import { randomUUID } from "node:crypto";
-import type { Prisma } from "../../../generated/prisma/client";
+import type { Prisma } from "../../../generated/prisma/client.js";
 import {
   PriorityLevel,
   Role,
   ScheduleStatus,
   ScheduleType,
-} from "../../../generated/prisma/client";
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import { type Actor, audit, type Db } from "../../utils/audit";
+} from "../../../generated/prisma/client.js";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import { type Actor, audit, type Db } from "../../utils/audit.js";
 import {
   containsInsensitive,
   fireAndForget,
   formatDateTime,
   round2,
-} from "../../utils/helpers";
-import { advisoryLock } from "../../utils/lock";
-import { buildMeta, getSkipTake } from "../../utils/pagination";
-import { assertZoneAccess } from "../../utils/zoneAccess";
+} from "../../utils/helpers.js";
+import { advisoryLock } from "../../utils/lock.js";
+import { buildMeta, getSkipTake } from "../../utils/pagination.js";
+import { assertZoneAccess } from "../../utils/zoneAccess.js";
 import {
   customerIdsFor,
   notifyUsers,
-} from "../notification/notification.service";
+} from "../notification/notification.service.js";
 import type {
   CreateScheduleInput,
   GenerateScheduleInput,
   ListSchedulesQuery,
   RescheduleInput,
-} from "./schedule.validator";
+} from "./schedule.validator.js";
 
 const HOUR_MS = 3_600_000;
 const PENDING = [ScheduleStatus.SCHEDULED, ScheduleStatus.ACTIVE];

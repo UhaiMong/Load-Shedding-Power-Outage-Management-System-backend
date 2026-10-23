@@ -1,8 +1,8 @@
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { getActor, getQuery, param } from "../../utils/typed";
-import * as service from "./schedule.service";
-import type { ListSchedulesQuery } from "./schedule.validator";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { getActor, getQuery, param } from "../../utils/typed.js";
+import * as service from "./schedule.service.js";
+import type { ListSchedulesQuery } from "./schedule.validator.js";
 
 export const create = catchAsync(async (req, res) => {
   sendResponse(res, {

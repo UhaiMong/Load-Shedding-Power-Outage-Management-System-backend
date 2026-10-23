@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { ROLE_GROUPS, Role } from "../../config/roles";
-import { authenticate, authorize } from "../../middleware/authenticate";
-import { validate } from "../../middleware/validate";
-import * as controller from "./bill.controller";
+import { ROLE_GROUPS, Role } from "../../config/roles.js";
+import { authenticate, authorize } from "../../middleware/authenticate.js";
+import { validate } from "../../middleware/validate.js";
+import * as controller from "./bill.controller.js";
 import {
   createBillSchema,
   idParamSchema,
   listBillsQuery,
-} from "./bill.validator";
+} from "./bill.validator.js";
 
 const router = Router();
 router.use(authenticate);

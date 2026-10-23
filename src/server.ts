@@ -1,9 +1,9 @@
 import path from "node:path";
-import { app } from "./app";
-import { env } from "./config/env";
-import { cache } from "./lib/cache";
-import { prisma } from "./lib/prisma";
-import { syncScheduleStates } from "./modules/schedule/schedule.service";
+import { app } from "./app.js";
+import { env } from "./config/env.js";
+import { cache } from "./lib/cache.js";
+import { prisma } from "./lib/prisma.js";
+import { syncScheduleStates } from "./modules/schedule/schedule.service.js";
 
 const entryName = path.basename(process.argv[1] ?? "");
 const isServerProcess =

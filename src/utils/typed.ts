@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { Actor } from "./audit";
+import type { Actor } from "./audit.js";
 
 /** Validated query */
 export const getQuery = <T>(req: Request) => req.query as unknown as T;

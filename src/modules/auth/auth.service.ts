@@ -1,19 +1,19 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingHttpHeaders } from "node:http";
-import type { Prisma } from "../../../generated/prisma/client";
+import type { Prisma } from "../../../generated/prisma/client.js";
 import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../../lib/auth";
-import * as otp from "../../lib/otp";
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import { audit } from "../../utils/audit";
+import { auth } from "../../lib/auth.js";
+import * as otp from "../../lib/otp.js";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import { audit } from "../../utils/audit.js";
 import type {
   ChangePasswordInput,
   LoginInput,
   RegisterInput,
   ResetPasswordInput,
   VerifyEmailInput,
-} from "./auth.validator";
+} from "./auth.validator.js";
 
 const publicUser = {
   id: true,

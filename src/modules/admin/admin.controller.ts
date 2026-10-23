@@ -1,8 +1,8 @@
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { getActor, getQuery, param } from "../../utils/typed";
-import * as service from "./admin.service";
-import type { AuditLogsQuery, ListUsersQuery } from "./admin.validator";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { getActor, getQuery, param } from "../../utils/typed.js";
+import * as service from "./admin.service.js";
+import type { AuditLogsQuery, ListUsersQuery } from "./admin.validator.js";
 
 export const listUsers = catchAsync(async (req, res) => {
   const { items, meta } = await service.listUsers(

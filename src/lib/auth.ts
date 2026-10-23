@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer } from "better-auth/plugins";
-import { env } from "../config/env";
-import { prisma } from "./prisma";
+import { env } from "../config/env.js";
+import { prisma } from "./prisma.js";
 
 const hasGoogle = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
 

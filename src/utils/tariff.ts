@@ -1,4 +1,4 @@
-import { round2 } from "./helpers";
+import { round2 } from "./helpers.js";
 
 /** Tiered residential tariff (BDT per kWh). Values are configurable constants. */
 const SLABS = [

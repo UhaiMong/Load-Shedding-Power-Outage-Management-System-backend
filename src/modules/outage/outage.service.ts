@@ -1,30 +1,30 @@
-import type { Prisma } from "../../../generated/prisma/client";
-import { OutageStatus, Role, ScheduleStatus } from "../../../generated/prisma/enums";
-import { uploadImage } from "../../lib/cloudinary";
-import { sendMail } from "../../lib/mailer";
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import { type Actor, audit, type Db } from "../../utils/audit";
+import type { Prisma } from "../../../generated/prisma/client.js";
+import { OutageStatus, Role, ScheduleStatus } from "../../../generated/prisma/enums.js";
+import { uploadImage } from "../../lib/cloudinary.js";
+import { sendMail } from "../../lib/mailer.js";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import { type Actor, audit, type Db } from "../../utils/audit.js";
 import {
   containsInsensitive,
   fireAndForget,
   formatDateTime,
   generateTicketNo,
-} from "../../utils/helpers";
-import { advisoryLock } from "../../utils/lock";
-import { buildMeta, getSkipTake } from "../../utils/pagination";
-import { assertZoneAccess } from "../../utils/zoneAccess";
+} from "../../utils/helpers.js";
+import { advisoryLock } from "../../utils/lock.js";
+import { buildMeta, getSkipTake } from "../../utils/pagination.js";
+import { assertZoneAccess } from "../../utils/zoneAccess.js";
 import {
   customerIdsFor,
   notifyUsers,
   staffIdsForZone,
-} from "../notification/notification.service";
+} from "../notification/notification.service.js";
 import type {
   ListOutagesQuery,
   ReportOutageInput,
   UpdateStatusInput,
   VerifyOutageInput,
-} from "./outage.validator";
+} from "./outage.validator.js";
 
 const OPEN: OutageStatus[] = [
   OutageStatus.REPORTED,

@@ -1,8 +1,8 @@
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
-import { env, isProd } from "../config/env";
-import { AppError } from "../utils/ApiError";
-import { redis } from "./cache";
-import { sendMail } from "./mailer";
+import { env, isProd } from "../config/env.js";
+import { AppError } from "../utils/ApiError.js";
+import { redis } from "./cache.js";
+import { sendMail } from "./mailer.js";
 
 export type OtpPurpose = "VERIFY_EMAIL" | "RESET_PASSWORD" | "CHANGE_PASSWORD";
 

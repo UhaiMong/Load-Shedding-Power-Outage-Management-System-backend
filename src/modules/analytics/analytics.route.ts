@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { ROLE_GROUPS } from "../../config/roles";
-import { authenticate, authorize } from "../../middleware/authenticate";
-import { validate } from "../../middleware/validate";
-import * as controller from "./analytics.controller";
-import { analyticsQuery } from "./analytics.validator";
+import { ROLE_GROUPS } from "../../config/roles.js";
+import { authenticate, authorize } from "../../middleware/authenticate.js";
+import { validate } from "../../middleware/validate.js";
+import * as controller from "./analytics.controller.js";
+import { analyticsQuery } from "./analytics.validator.js";
 
 const router = Router();
 router.use(

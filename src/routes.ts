@@ -1,19 +1,19 @@
 import { Router } from "express";
-import adminRoutes from "./modules/admin/admin.route";
-import analyticsRoutes from "./modules/analytics/analytics.route";
-import authRoutes from "./modules/auth/auth.route";
-import billRoutes from "./modules/bill/bill.route";
+import adminRoutes from "./modules/admin/admin.route.js";
+import analyticsRoutes from "./modules/analytics/analytics.route.js";
+import authRoutes from "./modules/auth/auth.route.js";
+import billRoutes from "./modules/bill/bill.route.js";
 import {
 	areaRouter,
 	feederRouter,
 	substationRouter,
 	zoneRouter,
-} from "./modules/network/network.route";
-import notificationRoutes from "./modules/notification/notification.route";
-import outageRoutes from "./modules/outage/outage.route";
-import paymentRoutes from "./modules/payment/payment.route";
-import scheduleRoutes from "./modules/schedule/schedule.route";
-import userRoutes from "./modules/users/user.route";
+} from "./modules/network/network.route.js";
+import notificationRoutes from "./modules/notification/notification.route.js";
+import outageRoutes from "./modules/outage/outage.route.js";
+import paymentRoutes from "./modules/payment/payment.route.js";
+import scheduleRoutes from "./modules/schedule/schedule.route.js";
+import userRoutes from "./modules/users/user.route.js";
 
 const router = Router();
 

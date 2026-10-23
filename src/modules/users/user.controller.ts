@@ -1,9 +1,9 @@
 import type { Request } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { getActor, getQuery } from "../../utils/typed";
-import * as service from "./user.service";
-import type { ListTechniciansQuery } from "./user.validator";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { getActor, getQuery } from "../../utils/typed.js";
+import * as service from "./user.service.js";
+import type { ListTechniciansQuery } from "./user.validator.js";
 
 export const getMe = catchAsync(async (req: Request, res) => {
   const actorId = getActor(req).id;

@@ -1,7 +1,7 @@
-import { Role } from "../../generated/prisma/enums";
-import { prisma } from "../lib/prisma";
-import { AppError } from "./ApiError";
-import type { Actor } from "./audit";
+import { Role } from "../../generated/prisma/enums.js";
+import { prisma } from "../lib/prisma.js";
+import { AppError } from "./ApiError.js";
+import type { Actor } from "./audit.js";
 
 // Admin & operators have network-wide access
 export const assertZoneAccess = async (actor: Actor, zoneId: string) => {

@@ -1,13 +1,13 @@
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { getActor, getQuery, param } from "../../utils/typed";
-import * as service from "./network.service";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { getActor, getQuery, param } from "../../utils/typed.js";
+import * as service from "./network.service.js";
 import type {
   ListAreasQuery,
   ListFeedersQuery,
   ListSubstationsQuery,
   ListZonesQuery,
-} from "./network.validator";
+} from "./network.validator.js";
 
 // Zones
 export const createZone = catchAsync(async (req, res) => {

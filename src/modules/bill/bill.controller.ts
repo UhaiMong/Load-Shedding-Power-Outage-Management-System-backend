@@ -1,8 +1,8 @@
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { getActor, getQuery, param } from "../../utils/typed";
-import * as service from "./bill.service";
-import type { ListBillsQuery } from "./bill.validator";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { getActor, getQuery, param } from "../../utils/typed.js";
+import * as service from "./bill.service.js";
+import type { ListBillsQuery } from "./bill.validator.js";
 
 export const create = catchAsync(async (req, res) => {
   sendResponse(res, { statusCode: 201, message: "Bill created", data: await service.create(req.body, getActor(req)) });

@@ -1,8 +1,8 @@
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { getActor, getQuery, param } from "../../utils/typed";
-import * as service from "./payment.service";
-import type { CallbackQuery, ListPaymentsQuery } from "./payment.validator";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { getActor, getQuery, param } from "../../utils/typed.js";
+import * as service from "./payment.service.js";
+import type { CallbackQuery, ListPaymentsQuery } from "./payment.validator.js";
 
 export const initiate = catchAsync(async (req, res) => {
   const data = await service.initiate(req.body.billId, getActor(req));

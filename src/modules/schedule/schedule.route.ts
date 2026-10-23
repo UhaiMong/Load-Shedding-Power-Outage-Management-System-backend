@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { ROLE_GROUPS } from "../../config/roles";
-import { authenticate, authorize } from "../../middleware/authenticate";
-import { validate } from "../../middleware/validate";
-import * as controller from "./schedule.controller";
+import { ROLE_GROUPS } from "../../config/roles.js";
+import { authenticate, authorize } from "../../middleware/authenticate.js";
+import { validate } from "../../middleware/validate.js";
+import * as controller from "./schedule.controller.js";
 import {
   cancelScheduleSchema,
   createScheduleSchema,
@@ -10,7 +10,7 @@ import {
   idParamSchema,
   listSchedulesQuery,
   rescheduleSchema,
-} from "./schedule.validator";
+} from "./schedule.validator.js";
 
 const router = Router();
 router.use(authenticate);

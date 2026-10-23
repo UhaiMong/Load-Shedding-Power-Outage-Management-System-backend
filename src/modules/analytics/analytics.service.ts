@@ -1,7 +1,7 @@
-import { Prisma } from "../../../generated/prisma/client";
-import { cache } from "../../lib/cache";
-import { prisma } from "../../lib/prisma";
-import type { AnalyticsQuery } from "./analytics.validator";
+import { Prisma } from "../../../generated/prisma/client.js";
+import { cache } from "../../lib/cache.js";
+import { prisma } from "../../lib/prisma.js";
+import type { AnalyticsQuery } from "./analytics.validator.js";
 
 const cacheKey = (name: string, q: AnalyticsQuery) =>
   `analytics:${name}:${q.from.toISOString().slice(0, 13)}:${q.to.toISOString().slice(0, 13)}:${q.limit}`;

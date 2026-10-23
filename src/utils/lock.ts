@@ -1,4 +1,4 @@
-import type { Db } from "./audit";
+import type { Db } from "./audit.js";
 
 // Transaction-scoped Postgres advisory lock
 export const advisoryLock = (tx: Db, key: string) =>

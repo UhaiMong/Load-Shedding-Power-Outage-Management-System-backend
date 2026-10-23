@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import * as service from "./auth.service";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import * as service from "./auth.service.js";
 
 export const register = catchAsync(async (req, res) => {
   const data = await service.register(req.body, req.ip);

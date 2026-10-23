@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
-import { env } from "../config/env";
-import { AppError } from "../utils/ApiError";
+import { env } from "../config/env.js";
+import { AppError } from "../utils/ApiError.js";
 
 export const uploadImage = async (
   buffer: Buffer,

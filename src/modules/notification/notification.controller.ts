@@ -1,9 +1,9 @@
 import type { Request } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { getQuery, param } from "../../utils/typed";
-import * as service from "./notification.service";
-import type { ListNotificationsQuery } from "./notification.validator";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { getQuery, param } from "../../utils/typed.js";
+import * as service from "./notification.service.js";
+import type { ListNotificationsQuery } from "./notification.validator.js";
 
 type AuthenticatedRequest = Request & { user: { id: string } };
 

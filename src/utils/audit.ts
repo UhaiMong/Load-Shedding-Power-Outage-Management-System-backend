@@ -1,6 +1,6 @@
-import type { Prisma } from "../../generated/prisma/client";
+import type { Prisma } from "../../generated/prisma/client.js";
 
-import type { Role } from "../../generated/prisma/enums";
+import type { Role } from "../../generated/prisma/enums.js";
 
 export type Db = Prisma.TransactionClient;
 

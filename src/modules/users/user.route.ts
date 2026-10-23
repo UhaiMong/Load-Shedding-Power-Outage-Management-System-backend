@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { ROLE_GROUPS } from "../../config/roles";
-import { authenticate, authorize } from "../../middleware/authenticate";
-import { uploadImage } from "../../middleware/upload";
-import { validate } from "../../middleware/validate";
-import * as controller from "./user.controller";
+import { ROLE_GROUPS } from "../../config/roles.js";
+import { authenticate, authorize } from "../../middleware/authenticate.js";
+import { uploadImage } from "../../middleware/upload.js";
+import { validate } from "../../middleware/validate.js";
+import * as controller from "./user.controller.js";
 import {
   availabilitySchema,
   listTechniciansQuery,
   updateMeSchema,
-} from "./user.validator";
+} from "./user.validator.js";
 
 const router = Router();
 router.use(authenticate);

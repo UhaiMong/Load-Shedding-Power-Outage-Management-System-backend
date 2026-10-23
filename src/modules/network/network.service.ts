@@ -1,12 +1,12 @@
-import type { Prisma } from "../../../generated/prisma/client";
-import { Role, ScheduleStatus } from "../../../generated/prisma/enums";
-import { cache } from "../../lib/cache";
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import { type Actor, audit } from "../../utils/audit";
-import { containsInsensitive } from "../../utils/helpers";
-import { buildMeta, getSkipTake } from "../../utils/pagination";
-import { assertZoneAccess } from "../../utils/zoneAccess";
+import type { Prisma } from "../../../generated/prisma/client.js";
+import { Role, ScheduleStatus } from "../../../generated/prisma/enums.js";
+import { cache } from "../../lib/cache.js";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import { type Actor, audit } from "../../utils/audit.js";
+import { containsInsensitive } from "../../utils/helpers.js";
+import { buildMeta, getSkipTake } from "../../utils/pagination.js";
+import { assertZoneAccess } from "../../utils/zoneAccess.js";
 import type {
   CreateAreaInput,
   CreateFeederInput,
@@ -21,7 +21,7 @@ import type {
   UpdateFeederLoadInput,
   UpdateSubstationInput,
   UpdateZoneInput,
-} from "./network.validator";
+} from "./network.validator.js";
 
 const live = { deletedAt: null } as const;
 const invalidate = () => cache.invalidate("network:");

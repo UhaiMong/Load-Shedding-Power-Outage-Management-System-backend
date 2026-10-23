@@ -1,5 +1,5 @@
 import multer from "multer";
-import { AppError } from "../utils/ApiError";
+import { AppError } from "../utils/ApiError.js";
 
 export const uploadImage = multer({
 	storage: multer.memoryStorage(),

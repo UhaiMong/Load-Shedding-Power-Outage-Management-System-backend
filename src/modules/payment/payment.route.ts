@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { ROLE_GROUPS, Role } from "../../config/roles";
-import { authenticate, authorize } from "../../middleware/authenticate";
-import { paymentLimiter } from "../../middleware/rateLimiter";
-import { validate } from "../../middleware/validate";
-import * as controller from "./payment.controller";
+import { ROLE_GROUPS, Role } from "../../config/roles.js";
+import { authenticate, authorize } from "../../middleware/authenticate.js";
+import { paymentLimiter } from "../../middleware/rateLimiter.js";
+import { validate } from "../../middleware/validate.js";
+import * as controller from "./payment.controller.js";
 import {
   callbackQuerySchema,
   idParamSchema,
   initiatePaymentSchema,
   listPaymentsQuery,
   webhookSchema,
-} from "./payment.validator";
+} from "./payment.validator.js";
 
 const router = Router();
 

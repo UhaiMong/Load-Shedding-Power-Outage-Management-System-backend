@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { ROLE_GROUPS } from "../../config/roles";
-import { authenticate, authorize } from "../../middleware/authenticate";
-import { validate } from "../../middleware/validate";
-import * as c from "./network.controller";
-import * as v from "./network.validator";
+import { ROLE_GROUPS } from "../../config/roles.js";
+import { authenticate, authorize } from "../../middleware/authenticate.js";
+import { validate } from "../../middleware/validate.js";
+import * as c from "./network.controller.js";
+import * as v from "./network.validator.js";
 
 const manage = authorize(...ROLE_GROUPS.MANAGEMENT);
 const adminOnly = authorize(...ROLE_GROUPS.ADMIN);

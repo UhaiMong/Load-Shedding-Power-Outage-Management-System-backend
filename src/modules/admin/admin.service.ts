@@ -1,24 +1,24 @@
-import type { Prisma } from "../../../generated/prisma/client";
+import type { Prisma } from "../../../generated/prisma/client.js";
 import {
   BillStatus,
   OutageStatus,
   PaymentStatus,
   Role,
   ScheduleStatus,
-} from "../../../generated/prisma/enums";
-import { auth } from "../../lib/auth";
-import { cache } from "../../lib/cache";
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import { type Actor, audit } from "../../utils/audit";
-import { containsInsensitive } from "../../utils/helpers";
-import { buildMeta, getSkipTake } from "../../utils/pagination";
+} from "../../../generated/prisma/enums.js";
+import { auth } from "../../lib/auth.js";
+import { cache } from "../../lib/cache.js";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import { type Actor, audit } from "../../utils/audit.js";
+import { containsInsensitive } from "../../utils/helpers.js";
+import { buildMeta, getSkipTake } from "../../utils/pagination.js";
 import type {
   AuditLogsQuery,
   CreateStaffInput,
   ListUsersQuery,
   UpdateRoleInput,
-} from "./admin.validator";
+} from "./admin.validator.js";
 
 const userSelect = {
   id: true,

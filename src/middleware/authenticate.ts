@@ -1,10 +1,10 @@
-import type { Role } from "../../generated/prisma/enums";
+import type { Role } from "../../generated/prisma/enums.js";
 import { fromNodeHeaders } from "better-auth/node";
 import type { Request, RequestHandler } from "express";
-import { auth } from "../lib/auth";
-import { prisma } from "../lib/prisma";
-import { AppError } from "../utils/ApiError";
-import { catchAsync } from "../utils/catchAsync";
+import { auth } from "../lib/auth.js";
+import { prisma } from "../lib/prisma.js";
+import { AppError } from "../utils/ApiError.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string; role: Role };

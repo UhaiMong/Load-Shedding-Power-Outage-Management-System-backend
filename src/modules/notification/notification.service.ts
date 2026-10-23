@@ -1,9 +1,9 @@
-import { type NotificationType, Role } from "../../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import type { Db } from "../../utils/audit";
-import { buildMeta, getSkipTake } from "../../utils/pagination";
-import type { ListNotificationsQuery } from "./notification.validator";
+import { type NotificationType, Role } from "../../../generated/prisma/enums.js";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import type { Db } from "../../utils/audit.js";
+import { buildMeta, getSkipTake } from "../../utils/pagination.js";
+import type { ListNotificationsQuery } from "./notification.validator.js";
 
 interface Payload {
   type: NotificationType;

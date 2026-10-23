@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { env } from "../config/env";
+import { env } from "../config/env.js";
 
 export const formatDateTime = (date: Date) =>
   new Intl.DateTimeFormat("en-GB", {

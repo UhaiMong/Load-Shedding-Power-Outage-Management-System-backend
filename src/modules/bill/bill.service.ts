@@ -1,13 +1,13 @@
-import type { Prisma } from "../../../generated/prisma/client";
-import { BillStatus, Role } from "../../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
-import { AppError } from "../../utils/ApiError";
-import { type Actor, audit } from "../../utils/audit";
-import { fireAndForget, formatDateTime } from "../../utils/helpers";
-import { buildMeta, getSkipTake } from "../../utils/pagination";
-import { calculateBill } from "../../utils/tariff";
-import { notifyUsers } from "../notification/notification.service";
-import type { CreateBillInput, ListBillsQuery } from "./bill.validator";
+import type { Prisma } from "../../../generated/prisma/client.js";
+import { BillStatus, Role } from "../../../generated/prisma/enums.js";
+import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/ApiError.js";
+import { type Actor, audit } from "../../utils/audit.js";
+import { fireAndForget, formatDateTime } from "../../utils/helpers.js";
+import { buildMeta, getSkipTake } from "../../utils/pagination.js";
+import { calculateBill } from "../../utils/tariff.js";
+import { notifyUsers } from "../notification/notification.service.js";
+import type { CreateBillInput, ListBillsQuery } from "./bill.validator.js";
 
 const billSelect = {
   id: true,
